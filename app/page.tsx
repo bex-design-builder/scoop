@@ -241,6 +241,14 @@ export default function ChatbotPage() {
     seg: BASE - 3,       // 5  — segmented toggle inner pill
   };
 
+  // Letter spacing — Inter needs less positive tracking at small sizes and
+  // less negative tracking at large sizes than Instrument Sans.
+  const ls = {
+    heading:  useInter ? "-0.02em" : "-0.03em",   // 36px display heading
+    wordmark: useInter ? "0"       : "-0.01em",   // "Scoop" logo/header
+    label:    useInter ? "-0.01em" : "0.02em",    // 13px sidebar section labels
+  };
+
   function openSidebar() {
     setSidebarOpen(true);
   }
@@ -359,7 +367,7 @@ export default function ChatbotPage() {
             onMouseEnter={e => (e.currentTarget.style.background = hoverBg)}
             onMouseLeave={e => (e.currentTarget.style.background = "none")}
           >
-            <span style={{ fontSize: 15, fontWeight: 600, color: textPrimary, letterSpacing: "-0.01em" }}>Scoop</span>
+            <span style={{ fontSize: 15, fontWeight: 600, color: textPrimary, letterSpacing: ls.wordmark }}>Scoop</span>
           </button>
           <Tooltip label="Close sidebar" position="bottom">
             <button
@@ -404,7 +412,7 @@ export default function ChatbotPage() {
           <div style={{ marginBottom: 8 }}>
             <button
               onClick={() => setAppsOpen(o => !o)}
-              style={{ width: "100%", display: "flex", alignItems: "center", gap: 6, paddingInline: 12, minHeight: 48, borderRadius: r.md, border: "none", background: "none", cursor: "pointer", fontSize: 13, fontWeight: 500, letterSpacing: "0.02em", textTransform: "none" as const, color: textMuted, textAlign: "left" }}
+              style={{ width: "100%", display: "flex", alignItems: "center", gap: 6, paddingInline: 12, minHeight: 48, borderRadius: r.md, border: "none", background: "none", cursor: "pointer", fontSize: 13, fontWeight: 500, letterSpacing: ls.label, textTransform: "none" as const, color: textMuted, textAlign: "left" }}
               onMouseEnter={e => (e.currentTarget.style.background = hoverBg)}
               onMouseLeave={e => (e.currentTarget.style.background = "none")}
             >
@@ -424,7 +432,7 @@ export default function ChatbotPage() {
           <div style={{ marginBottom: 8 }}>
             <button
               onClick={() => setDataSourcesOpen(o => !o)}
-              style={{ width: "100%", display: "flex", alignItems: "center", gap: 6, paddingInline: 12, minHeight: 48, borderRadius: r.md, border: "none", background: "none", cursor: "pointer", fontSize: 13, fontWeight: 500, letterSpacing: "0.02em", textTransform: "none" as const, color: textMuted, textAlign: "left" }}
+              style={{ width: "100%", display: "flex", alignItems: "center", gap: 6, paddingInline: 12, minHeight: 48, borderRadius: r.md, border: "none", background: "none", cursor: "pointer", fontSize: 13, fontWeight: 500, letterSpacing: ls.label, textTransform: "none" as const, color: textMuted, textAlign: "left" }}
               onMouseEnter={e => (e.currentTarget.style.background = hoverBg)}
               onMouseLeave={e => (e.currentTarget.style.background = "none")}
             >
@@ -444,7 +452,7 @@ export default function ChatbotPage() {
           <div style={{ marginBottom: 8 }}>
             <button
               onClick={() => setDevToolsOpen(o => !o)}
-              style={{ width: "100%", display: "flex", alignItems: "center", gap: 6, paddingInline: 12, minHeight: 48, borderRadius: r.md, border: "none", background: "none", cursor: "pointer", fontSize: 13, fontWeight: 500, letterSpacing: "0.02em", textTransform: "none" as const, color: textMuted, textAlign: "left" }}
+              style={{ width: "100%", display: "flex", alignItems: "center", gap: 6, paddingInline: 12, minHeight: 48, borderRadius: r.md, border: "none", background: "none", cursor: "pointer", fontSize: 13, fontWeight: 500, letterSpacing: ls.label, textTransform: "none" as const, color: textMuted, textAlign: "left" }}
               onMouseEnter={e => (e.currentTarget.style.background = hoverBg)}
               onMouseLeave={e => (e.currentTarget.style.background = "none")}
             >
@@ -468,7 +476,7 @@ export default function ChatbotPage() {
           <div style={{ marginBottom: 8 }}>
             <button
               onClick={() => setSettingsOpen(o => !o)}
-              style={{ width: "100%", display: "flex", alignItems: "center", gap: 6, paddingInline: 12, minHeight: 48, borderRadius: r.md, border: "none", background: "none", cursor: "pointer", fontSize: 13, fontWeight: 500, letterSpacing: "0.02em", textTransform: "none" as const, color: textMuted, textAlign: "left" }}
+              style={{ width: "100%", display: "flex", alignItems: "center", gap: 6, paddingInline: 12, minHeight: 48, borderRadius: r.md, border: "none", background: "none", cursor: "pointer", fontSize: 13, fontWeight: 500, letterSpacing: ls.label, textTransform: "none" as const, color: textMuted, textAlign: "left" }}
               onMouseEnter={e => (e.currentTarget.style.background = hoverBg)}
               onMouseLeave={e => (e.currentTarget.style.background = "none")}
             >
@@ -517,7 +525,7 @@ export default function ChatbotPage() {
           {/* Recents */}
           <div style={{ marginBottom: 8, marginTop: 16 }}>
             <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", paddingInline: 12, marginBottom: 8 }}>
-              <span style={{ fontSize: 13, fontWeight: 500, letterSpacing: "0.02em", textTransform: "none" as const, color: textMuted }}>Recents</span>
+              <span style={{ fontSize: 13, fontWeight: 500, letterSpacing: ls.label, textTransform: "none" as const, color: textMuted }}>Recents</span>
             </div>
             {PAST_CHATS.map(chat => (
               <button
@@ -588,7 +596,7 @@ export default function ChatbotPage() {
             onMouseLeave={e => (e.currentTarget.style.background = "none")}
           >
             <ScrapIcon />
-            <span style={{ fontSize: 16, fontWeight: 600, color: textPrimary, letterSpacing: "-0.01em" }}>Scoop</span>
+            <span style={{ fontSize: 16, fontWeight: 600, color: textPrimary, letterSpacing: ls.wordmark }}>Scoop</span>
           </button>
         ) : (
           <div style={{ position: "relative" }}>
@@ -634,7 +642,7 @@ export default function ChatbotPage() {
         <div style={{ flex: 1, overflowY: "auto", display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center" }}>
         <div style={{ maxWidth: 680, width: "100%", padding: "0 16px 80px" }}>
           <div style={{ marginBottom: 32, textAlign: "center" }}>
-            <h2 style={{ fontSize: 36, fontWeight: 600, color: textPrimary, letterSpacing: "-0.03em", lineHeight: 1.2, marginBottom: 12 }}>Ask about any part,<br />fault, or service.</h2>
+            <h2 style={{ fontSize: 36, fontWeight: 600, color: textPrimary, letterSpacing: ls.heading, lineHeight: 1.2, marginBottom: 12 }}>Ask about any part,<br />fault, or service.</h2>
             <p style={{ fontSize: 15, color: textMuted, lineHeight: 1.5, maxWidth: isMobile ? 220 : "none", margin: "0 auto" }}>Scoop pulls from your manuals, work orders, and fleet data.</p>
           </div>
           <div style={{ display: "flex", flexWrap: "wrap", gap: 8, width: "100%", marginBottom: 32, justifyContent: "center" }}>
