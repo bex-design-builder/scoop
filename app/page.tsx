@@ -104,6 +104,21 @@ const ScrapIcon = () => (
   <img src="/logo.jpeg" alt="Scoop" width={32} height={32} style={{ borderRadius: 8, display: "block", objectFit: "cover" }} />
 );
 
+// ── Focus trap (for modals) ──────────────────────────────────────────
+function trapFocus(e: React.KeyboardEvent<HTMLDivElement>) {
+  if (e.key !== "Tab") return;
+  const focusable = Array.from(e.currentTarget.querySelectorAll<HTMLElement>(
+    'button:not([disabled]), [href], input, select, textarea, [tabindex]:not([tabindex="-1"])'
+  ));
+  const first = focusable[0];
+  const last = focusable[focusable.length - 1];
+  if (e.shiftKey) {
+    if (document.activeElement === first) { e.preventDefault(); last.focus(); }
+  } else {
+    if (document.activeElement === last) { e.preventDefault(); first.focus(); }
+  }
+}
+
 // ── Tooltip ──────────────────────────────────────────────────────────
 function Tooltip({ label, children, position = "bottom" }: { label: string; children: React.ReactNode; position?: "top" | "bottom" | "left" | "right" }) {
   return (
@@ -227,7 +242,7 @@ export default function ChatbotPage() {
   const sidebarBg = dark ? "#1a1a1a" : "#f5f5f3";
   const border    = dark ? "#333"    : "#e5e5e3";
   const textPrimary = dark ? "#f0f0ef" : "#1a1a1a";
-  const textMuted   = dark ? "#888"   : "#7a7a78";
+  const textMuted   = dark ? "#9b9b9b" : "#686866";
   const inputBg     = dark ? "#2a2a2a" : "#fafaf9";
   const hoverBg     = dark ? "#2e2e2e" : "#f0f0ef";
 
@@ -257,6 +272,11 @@ export default function ChatbotPage() {
   return (
     <div className="scoop-app" style={{ fontFamily: useInter ? "var(--font-inter), system-ui, sans-serif" : "var(--font-instrument), system-ui, sans-serif", background: bg, height: "100dvh", display: "flex", flexDirection: "column", color: textPrimary, transition: "background 0.2s, color 0.2s", overflow: "hidden" }}>
 
+      {/* ── Screen-reader live region for AI responses ────────── */}
+      <div role="status" aria-live="polite" aria-atomic="true" style={{ position: "absolute", width: 1, height: 1, overflow: "hidden", clip: "rect(0,0,0,0)", whiteSpace: "nowrap" }}>
+        {thinking ? "Scoop is thinking…" : messages[messages.length - 1]?.role === "assistant" ? messages[messages.length - 1].content : ""}
+      </div>
+
       {/* ── Backdrop (sidebar + apps) ─────────────────────────── */}
       {(sidebarOpen || chatMenuOpen) && (
         <div
@@ -272,7 +292,11 @@ export default function ChatbotPage() {
           style={{ position: "fixed", inset: 0, zIndex: 50, background: "rgba(0,0,0,0.3)", backdropFilter: "blur(2px)", display: "flex", alignItems: "flex-start", justifyContent: "center", paddingTop: 80 }}
         >
           <div
+            role="dialog"
+            aria-modal="true"
+            aria-label="Search chats"
             onClick={e => e.stopPropagation()}
+            onKeyDown={trapFocus}
             style={{ background: surface, borderRadius: r.lg, boxShadow: "0 16px 48px rgba(0,0,0,0.18)", width: "min(560px, 90vw)", overflow: "hidden" }}
           >
             <div style={{ display: "flex", alignItems: "center", gap: 10, padding: "14px 16px", borderBottom: `1px solid ${border}` }}>
@@ -320,10 +344,14 @@ export default function ChatbotPage() {
           style={{ position: "fixed", inset: 0, zIndex: 50, background: "rgba(0,0,0,0.3)", backdropFilter: "blur(2px)", display: "flex", alignItems: "center", justifyContent: "center" }}
         >
           <div
+            role="dialog"
+            aria-modal="true"
+            aria-labelledby="rename-dialog-title"
             onClick={e => e.stopPropagation()}
+            onKeyDown={trapFocus}
             style={{ background: surface, borderRadius: r.lg, boxShadow: "0 16px 48px rgba(0,0,0,0.18)", width: "min(420px, 90vw)", padding: 24 }}
           >
-            <p style={{ fontSize: 16, fontWeight: 600, color: textPrimary, marginBottom: 16 }}>Rename chat</p>
+            <p id="rename-dialog-title" style={{ fontSize: 16, fontWeight: 600, color: textPrimary, marginBottom: 16 }}>Rename chat</p>
             <input
               autoFocus
               value={renameValue}
@@ -344,6 +372,8 @@ export default function ChatbotPage() {
 
       {/* ── Sidebar panel ────────────────────────────────────────── */}
       <aside
+        aria-label="Sidebar navigation"
+        aria-hidden={!sidebarOpen}
         style={{
           position: "fixed",
           top: 0,
@@ -383,7 +413,7 @@ export default function ChatbotPage() {
         </div>
 
         {/* Nav items */}
-        <nav style={{ padding: "8px 8px 0", flexShrink: 0 }}>
+        <nav aria-label="Main navigation" style={{ padding: "8px 8px 0", flexShrink: 0 }}>
           {/* New chat */}
           <button
             onClick={() => { setSidebarOpen(false); setView("home"); }}
@@ -413,6 +443,7 @@ export default function ChatbotPage() {
           <div style={{ marginBottom: 8 }}>
             <button
               onClick={() => setAppsOpen(o => !o)}
+              aria-expanded={appsOpen}
               style={{ width: "100%", display: "flex", alignItems: "center", gap: 6, paddingInline: 12, minHeight: 48, borderRadius: r.md, border: "none", background: "none", cursor: "pointer", fontSize: 13, fontWeight: 500, letterSpacing: ls.label, textTransform: "none" as const, color: textMuted, textAlign: "left" }}
               onMouseEnter={e => (e.currentTarget.style.background = hoverBg)}
               onMouseLeave={e => (e.currentTarget.style.background = "none")}
@@ -433,6 +464,7 @@ export default function ChatbotPage() {
           <div style={{ marginBottom: 8 }}>
             <button
               onClick={() => setDataSourcesOpen(o => !o)}
+              aria-expanded={dataSourcesOpen}
               style={{ width: "100%", display: "flex", alignItems: "center", gap: 6, paddingInline: 12, minHeight: 48, borderRadius: r.md, border: "none", background: "none", cursor: "pointer", fontSize: 13, fontWeight: 500, letterSpacing: ls.label, textTransform: "none" as const, color: textMuted, textAlign: "left" }}
               onMouseEnter={e => (e.currentTarget.style.background = hoverBg)}
               onMouseLeave={e => (e.currentTarget.style.background = "none")}
@@ -453,6 +485,7 @@ export default function ChatbotPage() {
           <div style={{ marginBottom: 8 }}>
             <button
               onClick={() => setDevToolsOpen(o => !o)}
+              aria-expanded={devToolsOpen}
               style={{ width: "100%", display: "flex", alignItems: "center", gap: 6, paddingInline: 12, minHeight: 48, borderRadius: r.md, border: "none", background: "none", cursor: "pointer", fontSize: 13, fontWeight: 500, letterSpacing: ls.label, textTransform: "none" as const, color: textMuted, textAlign: "left" }}
               onMouseEnter={e => (e.currentTarget.style.background = hoverBg)}
               onMouseLeave={e => (e.currentTarget.style.background = "none")}
@@ -477,6 +510,7 @@ export default function ChatbotPage() {
           <div style={{ marginBottom: 8 }}>
             <button
               onClick={() => setSettingsOpen(o => !o)}
+              aria-expanded={settingsOpen}
               style={{ width: "100%", display: "flex", alignItems: "center", gap: 6, paddingInline: 12, minHeight: 48, borderRadius: r.md, border: "none", background: "none", cursor: "pointer", fontSize: 13, fontWeight: 500, letterSpacing: ls.label, textTransform: "none" as const, color: textMuted, textAlign: "left" }}
               onMouseEnter={e => (e.currentTarget.style.background = hoverBg)}
               onMouseLeave={e => (e.currentTarget.style.background = "none")}
@@ -488,9 +522,9 @@ export default function ChatbotPage() {
               <div style={{ paddingBottom: 4 }}>
                 <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", padding: "5px 12px" }}>
                   <span style={{ fontSize: 13, color: textPrimary }}>Appearance</span>
-                  <div style={{ display: "flex", background: dark ? "#333" : "#e8e8e6", borderRadius: r.pill, padding: 2, gap: 2 }}>
+                  <div role="radiogroup" aria-label="Appearance" style={{ display: "flex", background: dark ? "#333" : "#e8e8e6", borderRadius: r.pill, padding: 2, gap: 2 }}>
                     {(["Light", "Dark"] as const).map(opt => (
-                      <button key={opt} onClick={() => setDark(opt === "Dark")}
+                      <button key={opt} role="radio" aria-checked={(opt === "Dark") === dark} onClick={() => setDark(opt === "Dark")}
                         style={{ fontSize: 12, fontWeight: 500, padding: "4px 10px", borderRadius: r.seg, border: "none", cursor: "pointer", background: (opt === "Dark") === dark ? (dark ? "#555" : "#fff") : "transparent", color: (opt === "Dark") === dark ? textPrimary : textMuted, boxShadow: (opt === "Dark") === dark ? "0 1px 3px rgba(0,0,0,0.1)" : "none", transition: "all 0.15s" }}
                       >{opt}</button>
                     ))}
@@ -498,9 +532,9 @@ export default function ChatbotPage() {
                 </div>
                 <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", padding: "5px 12px" }}>
                   <span style={{ fontSize: 13, color: textPrimary }}>Language</span>
-                  <div style={{ display: "flex", background: dark ? "#333" : "#e8e8e6", borderRadius: r.pill, padding: 2, gap: 2 }}>
+                  <div role="radiogroup" aria-label="Language" style={{ display: "flex", background: dark ? "#333" : "#e8e8e6", borderRadius: r.pill, padding: 2, gap: 2 }}>
                     {(["EN", "ES"] as const).map(opt => (
-                      <button key={opt} onClick={() => setLang(opt.toLowerCase() as "en" | "es")}
+                      <button key={opt} role="radio" aria-checked={lang === opt.toLowerCase()} onClick={() => setLang(opt.toLowerCase() as "en" | "es")}
                         style={{ fontSize: 12, fontWeight: 500, padding: "4px 10px", borderRadius: r.seg, border: "none", cursor: "pointer", background: lang === opt.toLowerCase() ? (dark ? "#555" : "#fff") : "transparent", color: lang === opt.toLowerCase() ? textPrimary : textMuted, boxShadow: lang === opt.toLowerCase() ? "0 1px 3px rgba(0,0,0,0.1)" : "none", transition: "all 0.15s" }}
                       >{opt}</button>
                     ))}
@@ -508,11 +542,11 @@ export default function ChatbotPage() {
                 </div>
                 <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", padding: "5px 12px" }}>
                   <span style={{ fontSize: 13, color: textPrimary }}>Font</span>
-                  <div style={{ display: "flex", background: dark ? "#333" : "#e8e8e6", borderRadius: r.pill, padding: 2, gap: 2 }}>
+                  <div role="radiogroup" aria-label="Font" style={{ display: "flex", background: dark ? "#333" : "#e8e8e6", borderRadius: r.pill, padding: 2, gap: 2 }}>
                     {(["Instrument", "Inter"] as const).map(opt => {
                       const active = opt === "Inter" ? useInter : !useInter;
                       return (
-                        <button key={opt} onClick={() => setUseInter(opt === "Inter")}
+                        <button key={opt} role="radio" aria-checked={active} onClick={() => setUseInter(opt === "Inter")}
                           style={{ fontSize: 12, fontWeight: 500, padding: "4px 10px", borderRadius: r.seg, border: "none", cursor: "pointer", background: active ? (dark ? "#555" : "#fff") : "transparent", color: active ? textPrimary : textMuted, boxShadow: active ? "0 1px 3px rgba(0,0,0,0.1)" : "none", transition: "all 0.15s" }}
                         >{opt}</button>
                       );
@@ -560,6 +594,9 @@ export default function ChatbotPage() {
           )}
           <button
             onClick={() => setAccountMenuOpen(o => !o)}
+            aria-haspopup="true"
+            aria-expanded={accountMenuOpen}
+            aria-label="Account menu"
             style={{ width: "100%", display: "flex", alignItems: "center", gap: 10, padding: "10px 12px", borderRadius: r.md, border: "none", background: accountMenuOpen ? hoverBg : "none", cursor: "pointer", color: textPrimary, textAlign: "left" }}
             onMouseEnter={e => (e.currentTarget.style.background = hoverBg)}
             onMouseLeave={e => (e.currentTarget.style.background = accountMenuOpen ? hoverBg : "none")}
@@ -603,6 +640,9 @@ export default function ChatbotPage() {
           <div style={{ position: "relative" }}>
             <button
               onClick={() => setChatMenuOpen(o => !o)}
+              aria-haspopup="true"
+              aria-expanded={chatMenuOpen}
+              aria-label={`Chat options for ${chatTitle}`}
               style={{ display: "flex", alignItems: "center", gap: 6, background: chatMenuOpen ? hoverBg : "none", border: "none", cursor: "pointer", padding: "5px 10px", borderRadius: r.pill, color: textPrimary, fontSize: 14, fontWeight: 500, minHeight: 48 }}
               onMouseEnter={e => (e.currentTarget.style.background = hoverBg)}
               onMouseLeave={e => (e.currentTarget.style.background = chatMenuOpen ? hoverBg : "none")}
@@ -682,13 +722,14 @@ export default function ChatbotPage() {
               ><Icon name="add" size={20} />Add file or photo</button>
               <div style={{ flex: 1 }} />
               <Tooltip label="Voice input" position="top">
-                <button style={{ width: isMobile ? 48 : 34, height: isMobile ? 48 : 34, borderRadius: r.md, border: "none", background: "none", cursor: "pointer", display: "flex", alignItems: "center", justifyContent: "center", color: textMuted }}
+                <button aria-label="Voice input" style={{ width: isMobile ? 48 : 34, height: isMobile ? 48 : 34, borderRadius: r.md, border: "none", background: "none", cursor: "pointer", display: "flex", alignItems: "center", justifyContent: "center", color: textMuted }}
                   onMouseEnter={e => (e.currentTarget.style.background = hoverBg)}
                   onMouseLeave={e => (e.currentTarget.style.background = "none")}
                 ><Icon name="mic" size={24} /></button>
               </Tooltip>
               <Tooltip label={thinking ? "Stop" : "Send"} position="top">
                 <button
+                  aria-label={thinking ? "Stop" : "Send"}
                   onClick={() => thinking ? handleStop() : handleSend()}
                   style={{ width: isMobile ? 48 : 34, height: isMobile ? 48 : 34, borderRadius: r.md, background: input.trim() ? "rgb(241,102,34)" : dark ? "#333" : "#e5e5e3", border: "none", cursor: input.trim() ? "pointer" : "default", display: "flex", alignItems: "center", justifyContent: "center", color: input.trim() ? "#fff" : textMuted, transition: "background 0.15s", marginLeft: 8 }}
                 ><Icon name={thinking ? "stop" : "arrow_upward"} size={18} /></button>
@@ -721,6 +762,8 @@ export default function ChatbotPage() {
                       <Tooltip key={dir} label={dir === "up" ? "Good response" : "Bad response"} position="bottom">
                         <button
                           onClick={() => setFeedback(prev => ({ ...prev, [msg.id]: prev[msg.id] === dir ? null : dir }))}
+                          aria-pressed={active}
+                          aria-label={dir === "up" ? "Good response" : "Bad response"}
                           style={{ width: isMobile ? 48 : 30, height: isMobile ? 48 : 30, borderRadius: r.md, border: "none", background: active ? hoverBg : "none", cursor: "pointer", display: "flex", alignItems: "center", justifyContent: "center", color: active ? textPrimary : textMuted, transition: "background 0.15s, color 0.15s" }}
                           onMouseEnter={e => { if (!active) e.currentTarget.style.background = hoverBg; }}
                           onMouseLeave={e => { if (!active) e.currentTarget.style.background = "none"; }}
@@ -758,20 +801,21 @@ export default function ChatbotPage() {
             <div style={{ display: "flex", alignItems: "center", padding: "6px 8px 14px" }}>
               {/* Active conversation: icon only */}
               <Tooltip label="Add file or photo" position="top">
-                <button style={{ width: isMobile ? 48 : 34, height: isMobile ? 48 : 34, borderRadius: r.md, border: "none", background: "none", cursor: "pointer", display: "flex", alignItems: "center", justifyContent: "center", color: textMuted }}
+                <button aria-label="Add file or photo" style={{ width: isMobile ? 48 : 34, height: isMobile ? 48 : 34, borderRadius: r.md, border: "none", background: "none", cursor: "pointer", display: "flex", alignItems: "center", justifyContent: "center", color: textMuted }}
                   onMouseEnter={e => (e.currentTarget.style.background = hoverBg)}
                   onMouseLeave={e => (e.currentTarget.style.background = "none")}
                 ><Icon name="add" size={20} /></button>
               </Tooltip>
               <div style={{ flex: 1 }} />
               <Tooltip label="Voice input" position="top">
-                <button style={{ width: isMobile ? 48 : 34, height: isMobile ? 48 : 34, borderRadius: r.md, border: "none", background: "none", cursor: "pointer", display: "flex", alignItems: "center", justifyContent: "center", color: textMuted }}
+                <button aria-label="Voice input" style={{ width: isMobile ? 48 : 34, height: isMobile ? 48 : 34, borderRadius: r.md, border: "none", background: "none", cursor: "pointer", display: "flex", alignItems: "center", justifyContent: "center", color: textMuted }}
                   onMouseEnter={e => (e.currentTarget.style.background = hoverBg)}
                   onMouseLeave={e => (e.currentTarget.style.background = "none")}
                 ><Icon name="mic" size={24} /></button>
               </Tooltip>
               <Tooltip label={thinking ? "Stop" : "Send"} position="top">
                 <button
+                  aria-label={thinking ? "Stop" : "Send"}
                   onClick={() => thinking ? handleStop() : handleSend()}
                   style={{ width: isMobile ? 42 : 34, height: isMobile ? 42 : 34, borderRadius: r.md, background: (thinking || input.trim()) ? "rgb(241,102,34)" : dark ? "#333" : "#e5e5e3", border: "none", cursor: (thinking || input.trim()) ? "pointer" : "default", display: "flex", alignItems: "center", justifyContent: "center", color: (thinking || input.trim()) ? "#fff" : textMuted, transition: "background 0.15s", marginLeft: 8 }}
                 ><Icon name={thinking ? "stop" : "arrow_upward"} size={18} /></button>
@@ -806,6 +850,10 @@ export default function ChatbotPage() {
           .tt-top::after    { bottom: calc(100% + 6px); left: 50%; transform: translateX(-50%); }
           .tt-right::after  { left: calc(100% + 6px); top: 50%; transform: translateY(-50%); }
           .tt-left::after   { right: calc(100% + 6px); top: 50%; transform: translateY(-50%); }
+        }
+        :focus-visible { outline: 2px solid rgb(241,102,34); outline-offset: 2px; border-radius: 4px; }
+        @media (prefers-reduced-motion: reduce) {
+          *, *::before, *::after { transition-duration: 0.01ms !important; animation-duration: 0.01ms !important; }
         }
         @keyframes pulse {
           0%, 100% { opacity: 0.4; }
