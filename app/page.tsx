@@ -627,7 +627,7 @@ export default function ChatbotPage() {
               value={input}
               onChange={e => setInput(e.target.value)}
               onKeyDown={handleKeyDown}
-              placeholder={isMobile ? "Ask about a part, fault or service" : "Ask about a part, fault, service or anything else"}
+              placeholder="Ask Scoop anything"
               rows={1}
               style={{ width: "100%", background: "transparent", border: "none", outline: "none", resize: "none", fontSize: 15, lineHeight: 1.55, color: textPrimary, fontFamily: "inherit", padding: "16px 18px 0" }}
             />
@@ -687,7 +687,7 @@ export default function ChatbotPage() {
               value={input}
               onChange={e => setInput(e.target.value)}
               onKeyDown={handleKeyDown}
-              placeholder={isMobile ? "Ask about a part, fault or service" : "Ask about a part, fault, service or anything else"}
+              placeholder="Ask Scoop anything"
               rows={1}
               style={{ width: "100%", background: "transparent", border: "none", outline: "none", resize: "none", fontSize: 15, lineHeight: 1.55, color: textPrimary, fontFamily: "inherit", padding: "16px 18px 0" }}
             />
