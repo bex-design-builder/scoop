@@ -1,3 +1,15 @@
 * { box-sizing: border-box; margin: 0; padding: 0; }
+button, input, textarea, select { font-family: inherit; font-size: inherit; }
+a { text-decoration: none; color: inherit; }
 html { -webkit-font-smoothing: antialiased; }
-body { font-family: var(--font-inter), system-ui, sans-serif; }
+
+@media (pointer: coarse) {
+  button, a, input, select, [role="button"] {
+    min-height: 48px;
+    min-width: 48px;
+  }
+  textarea {
+    min-height: 48px;
+  }
+}
+body { font-family: var(--font-instrument), system-ui, sans-serif; }
