@@ -521,7 +521,7 @@ export default function ChatbotPage() {
             {settingsOpen && (
               <div style={{ paddingBottom: 4 }}>
                 <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", padding: "5px 12px" }}>
-                  <span style={{ fontSize: 13, color: textPrimary }}>Appearance</span>
+                  <span style={{ fontSize: 14, color: textPrimary }}>Appearance</span>
                   <div role="radiogroup" aria-label="Appearance" style={{ display: "flex", background: dark ? "#333" : "#e8e8e6", borderRadius: r.pill, padding: 2, gap: 2 }}>
                     {(["Light", "Dark"] as const).map(opt => (
                       <button key={opt} role="radio" aria-checked={(opt === "Dark") === dark} onClick={() => setDark(opt === "Dark")}
@@ -531,7 +531,7 @@ export default function ChatbotPage() {
                   </div>
                 </div>
                 <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", padding: "5px 12px" }}>
-                  <span style={{ fontSize: 13, color: textPrimary }}>Language</span>
+                  <span style={{ fontSize: 14, color: textPrimary }}>Language</span>
                   <div role="radiogroup" aria-label="Language" style={{ display: "flex", background: dark ? "#333" : "#e8e8e6", borderRadius: r.pill, padding: 2, gap: 2 }}>
                     {(["EN", "ES"] as const).map(opt => (
                       <button key={opt} role="radio" aria-checked={lang === opt.toLowerCase()} onClick={() => setLang(opt.toLowerCase() as "en" | "es")}
@@ -541,7 +541,7 @@ export default function ChatbotPage() {
                   </div>
                 </div>
                 <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", padding: "5px 12px" }}>
-                  <span style={{ fontSize: 13, color: textPrimary }}>Font</span>
+                  <span style={{ fontSize: 14, color: textPrimary }}>Font</span>
                   <div role="radiogroup" aria-label="Font" style={{ display: "flex", background: dark ? "#333" : "#e8e8e6", borderRadius: r.pill, padding: 2, gap: 2 }}>
                     {(["Instrument", "Inter"] as const).map(opt => {
                       const active = opt === "Inter" ? useInter : !useInter;
@@ -747,13 +747,13 @@ export default function ChatbotPage() {
             msg.role === "user" ? (
               // ── User bubble ────────────────────────────────────
               <div key={msg.id} style={{ display: "flex", justifyContent: "flex-end", paddingBottom: 8 }}>
-                <div style={{ background: dark ? "#2e2e2e" : "#ececea", borderRadius: "18px 18px 4px 18px", padding: "11px 16px", fontSize: 15, lineHeight: 1.55, color: textPrimary, maxWidth: "80%" }}>
+                <div style={{ background: dark ? "#2e2e2e" : "#ececea", borderRadius: "18px 18px 4px 18px", padding: "11px 16px", fontSize: 16, lineHeight: 1.55, color: textPrimary, maxWidth: "80%" }}>
                   {msg.content}
                 </div>
               </div>
             ) : (
               // ── Assistant response ──────────────────────────────
-              <div key={msg.id} style={{ paddingTop: 8, fontSize: 15, lineHeight: 1.7, color: msg.muted ? textMuted : textPrimary }}>
+              <div key={msg.id} style={{ paddingTop: 8, fontSize: 16, lineHeight: 1.7, color: msg.muted ? textMuted : textPrimary }}>
                 {formatContent(msg.content)}
                 <div style={{ display: "flex", gap: isMobile ? 8 : 4, marginTop: 10 }}>
                   {(["up", "down"] as const).map(dir => {
