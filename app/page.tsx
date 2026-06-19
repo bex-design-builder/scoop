@@ -144,6 +144,7 @@ function formatContent(content: string) {
 
 export default function ChatbotPage() {
   const [dark, setDark] = useState(false);
+  const [useInter, setUseInter] = useState(false);
   const [input, setInput] = useState("");
   const [messages, setMessages] = useState<Message[]>(SAMPLE_MESSAGES);
   const [sidebarOpen, setSidebarOpen] = useState(false);
@@ -236,7 +237,7 @@ export default function ChatbotPage() {
   }
 
   return (
-    <div className="scoop-app" style={{ fontFamily: "var(--font-instrument), system-ui, sans-serif", background: bg, height: "100dvh", display: "flex", flexDirection: "column", color: textPrimary, transition: "background 0.2s, color 0.2s", overflow: "hidden" }}>
+    <div className="scoop-app" style={{ fontFamily: useInter ? "var(--font-inter), system-ui, sans-serif" : "var(--font-instrument), system-ui, sans-serif", background: bg, height: "100dvh", display: "flex", flexDirection: "column", color: textPrimary, transition: "background 0.2s, color 0.2s", overflow: "hidden" }}>
 
       {/* ── Backdrop (sidebar + apps) ─────────────────────────── */}
       {(sidebarOpen || chatMenuOpen) && (
@@ -481,6 +482,19 @@ export default function ChatbotPage() {
                         style={{ fontSize: 12, fontWeight: 500, padding: "4px 10px", borderRadius: r.seg, border: "none", cursor: "pointer", background: lang === opt.toLowerCase() ? (dark ? "#555" : "#fff") : "transparent", color: lang === opt.toLowerCase() ? textPrimary : textMuted, boxShadow: lang === opt.toLowerCase() ? "0 1px 3px rgba(0,0,0,0.1)" : "none", transition: "all 0.15s" }}
                       >{opt}</button>
                     ))}
+                  </div>
+                </div>
+                <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", padding: "5px 12px" }}>
+                  <span style={{ fontSize: 13, color: textPrimary }}>Font</span>
+                  <div style={{ display: "flex", background: dark ? "#333" : "#e8e8e6", borderRadius: r.pill, padding: 2, gap: 2 }}>
+                    {(["Instrument", "Inter"] as const).map(opt => {
+                      const active = opt === "Inter" ? useInter : !useInter;
+                      return (
+                        <button key={opt} onClick={() => setUseInter(opt === "Inter")}
+                          style={{ fontSize: 12, fontWeight: 500, padding: "4px 10px", borderRadius: r.seg, border: "none", cursor: "pointer", background: active ? (dark ? "#555" : "#fff") : "transparent", color: active ? textPrimary : textMuted, boxShadow: active ? "0 1px 3px rgba(0,0,0,0.1)" : "none", transition: "all 0.15s" }}
+                        >{opt}</button>
+                      );
+                    })}
                   </div>
                 </div>
               </div>
