@@ -194,7 +194,7 @@ export default function ChatbotPage() {
 
   function handleStop() {
     setThinking(false);
-    setMessages(prev => [...prev, { id: Date.now(), role: "assistant", content: "_Scoop's response was interrupted._" }]);
+    setMessages(prev => [...prev, { id: Date.now(), role: "assistant", content: "Scoop's response was interrupted." }]);
   }
 
   function handleKeyDown(e: React.KeyboardEvent<HTMLTextAreaElement>) {
