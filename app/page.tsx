@@ -6,6 +6,7 @@ type Message = {
   id: number;
   role: "user" | "assistant";
   content: string;
+  muted?: boolean;
 };
 
 const SAMPLE_MESSAGES: Message[] = [
@@ -209,7 +210,7 @@ export default function ChatbotPage() {
 
   function handleStop() {
     setThinking(false);
-    setMessages(prev => [...prev, { id: Date.now(), role: "assistant", content: "Scoop's response was interrupted." }]);
+    setMessages(prev => [...prev, { id: Date.now(), role: "assistant", content: "Scoop's response was interrupted.", muted: true }]);
   }
 
   function handleKeyDown(e: React.KeyboardEvent<HTMLTextAreaElement>) {
@@ -711,7 +712,7 @@ export default function ChatbotPage() {
               </div>
             ) : (
               // ── Assistant response ──────────────────────────────
-              <div key={msg.id} style={{ paddingTop: 8, fontSize: 15, lineHeight: 1.7, color: textPrimary }}>
+              <div key={msg.id} style={{ paddingTop: 8, fontSize: 15, lineHeight: 1.7, color: msg.muted ? textMuted : textPrimary }}>
                 {formatContent(msg.content)}
                 <div style={{ display: "flex", gap: isMobile ? 8 : 4, marginTop: 10 }}>
                   {(["up", "down"] as const).map(dir => {
