@@ -525,7 +525,7 @@ export default function ChatbotPage() {
                   <div role="radiogroup" aria-label="Appearance" style={{ display: "flex", background: dark ? "#333" : "#e8e8e6", borderRadius: r.pill, padding: 2, gap: 2 }}>
                     {(["Light", "Dark"] as const).map(opt => (
                       <button key={opt} role="radio" aria-checked={(opt === "Dark") === dark} onClick={() => setDark(opt === "Dark")}
-                        style={{ fontSize: 12, fontWeight: 500, padding: "4px 10px", borderRadius: r.seg, border: "none", cursor: "pointer", background: (opt === "Dark") === dark ? (dark ? "#555" : "#fff") : "transparent", color: (opt === "Dark") === dark ? textPrimary : textMuted, boxShadow: (opt === "Dark") === dark ? "0 1px 3px rgba(0,0,0,0.1)" : "none", transition: "all 0.15s" }}
+                        style={{ fontSize: 13, fontWeight: 500, padding: "4px 10px", borderRadius: r.seg, border: "none", cursor: "pointer", background: (opt === "Dark") === dark ? (dark ? "#555" : "#fff") : "transparent", color: (opt === "Dark") === dark ? textPrimary : textMuted, boxShadow: (opt === "Dark") === dark ? "0 1px 3px rgba(0,0,0,0.1)" : "none", transition: "all 0.15s" }}
                       >{opt}</button>
                     ))}
                   </div>
@@ -535,7 +535,7 @@ export default function ChatbotPage() {
                   <div role="radiogroup" aria-label="Language" style={{ display: "flex", background: dark ? "#333" : "#e8e8e6", borderRadius: r.pill, padding: 2, gap: 2 }}>
                     {(["EN", "ES"] as const).map(opt => (
                       <button key={opt} role="radio" aria-checked={lang === opt.toLowerCase()} onClick={() => setLang(opt.toLowerCase() as "en" | "es")}
-                        style={{ fontSize: 12, fontWeight: 500, padding: "4px 10px", borderRadius: r.seg, border: "none", cursor: "pointer", background: lang === opt.toLowerCase() ? (dark ? "#555" : "#fff") : "transparent", color: lang === opt.toLowerCase() ? textPrimary : textMuted, boxShadow: lang === opt.toLowerCase() ? "0 1px 3px rgba(0,0,0,0.1)" : "none", transition: "all 0.15s" }}
+                        style={{ fontSize: 13, fontWeight: 500, padding: "4px 10px", borderRadius: r.seg, border: "none", cursor: "pointer", background: lang === opt.toLowerCase() ? (dark ? "#555" : "#fff") : "transparent", color: lang === opt.toLowerCase() ? textPrimary : textMuted, boxShadow: lang === opt.toLowerCase() ? "0 1px 3px rgba(0,0,0,0.1)" : "none", transition: "all 0.15s" }}
                       >{opt}</button>
                     ))}
                   </div>
@@ -547,7 +547,7 @@ export default function ChatbotPage() {
                       const active = opt === "Inter" ? useInter : !useInter;
                       return (
                         <button key={opt} role="radio" aria-checked={active} onClick={() => setUseInter(opt === "Inter")}
-                          style={{ fontSize: 12, fontWeight: 500, padding: "4px 10px", borderRadius: r.seg, border: "none", cursor: "pointer", background: active ? (dark ? "#555" : "#fff") : "transparent", color: active ? textPrimary : textMuted, boxShadow: active ? "0 1px 3px rgba(0,0,0,0.1)" : "none", transition: "all 0.15s" }}
+                          style={{ fontSize: 13, fontWeight: 500, padding: "4px 10px", borderRadius: r.seg, border: "none", cursor: "pointer", background: active ? (dark ? "#555" : "#fff") : "transparent", color: active ? textPrimary : textMuted, boxShadow: active ? "0 1px 3px rgba(0,0,0,0.1)" : "none", transition: "all 0.15s" }}
                         >{opt}</button>
                       );
                     })}
