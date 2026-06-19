@@ -76,6 +76,8 @@ const SVG_PATHS: Record<string, string> = {
   logout: "M200-120q-33 0-56.5-23.5T120-200v-560q0-33 23.5-56.5T200-840h240q17 0 28.5 11.5T480-800q0 17-11.5 28.5T440-760H200v560h240q17 0 28.5 11.5T480-160q0 17-11.5 28.5T440-120H200Zm487-320H400q-17 0-28.5-11.5T360-480q0-17 11.5-28.5T400-520h287l-75-75q-11-11-11-27t11-28q11-12 28-12.5t29 11.5l143 143q12 12 12 28t-12 28L669-309q-12 12-28.5 11.5T612-310q-11-12-10.5-28.5T613-366l74-74Z",
   camera: "M480-260q75 0 127.5-52.5T660-440q0-75-52.5-127.5T480-620q-75 0-127.5 52.5T300-440q0 75 52.5 127.5T480-260Zm0-80q-42 0-71-29t-29-71q0-42 29-71t71-29q42 0 71 29t29 71q0 42-29 71t-71 29ZM160-120q-33 0-56.5-23.5T80-200v-480q0-33 23.5-56.5T160-760h126l50-54q11-12 26.5-19t32.5-7h170q17 0 32.5 7t26.5 19l50 54h126q33 0 56.5 23.5T880-680v480q0 33-23.5 56.5T800-120H160Zm0-80h640v-480H638l-73-80H395l-73 80H160v480Zm320-240Z",
   attach: "M720-330q0 104-73 177T470-80q-104 0-177-73t-73-177v-370q0-75 52.5-127.5T400-880q75 0 127.5 52.5T580-700v350q0 46-32 78t-78 32q-46 0-78-32t-32-78v-330q0-17 11.5-28.5T400-720q17 0 28.5 11.5T440-680v330q0 13 8.5 21.5T470-320q13 0 21.5-8.5T500-350v-350q-1-42-29.5-71T400-800q-42 0-71 29t-29 71v370q-1 71 49 120.5T470-160q70 0 119-49.5T640-330v-350q0-17 11.5-28.5T680-720q17 0 28.5 11.5T720-680v350Z",
+  thumb_up: "M840-640q32 0 56 24t24 56v80q0 7-2 15t-4 15L794-168q-9 20-30 34t-44 14H280v-520l240-238q15-15 35.5-17.5T595-888q19 10 28 28t4 37l-45 183h258Zm-480 34v406h360l120-280v-80H480l54-220-174 174ZM160-120q-33 0-56.5-23.5T80-200v-360q0-33 23.5-56.5T160-640h120v80H160v360h120v80H160Zm200-80v-406 406Z",
+  thumb_down: "M120-320q-32 0-56-24t-24-56v-80q0-7 2-15t4-15l120-282q9-20 30-34t44-14h440v520L440-82q-15 15-35.5 17.5T365-72q-19-10-28-28t-4-37l45-183H120Zm480-34v-406H240L120-480v80h360l-54 220 174-174Zm200-486q33 0 56.5 23.5T880-760v360q0 33-23.5 56.5T800-320H680v-80h120v-360H680v-80h120Zm-200 80v406-406Z",
 };
 
 function Icon({ name, size = ICON_SIZE, style = {} }: { name: string; size?: number; style?: React.CSSProperties }) {
@@ -158,6 +160,7 @@ export default function ChatbotPage() {
   const [renameOpen, setRenameOpen] = useState(false);
   const [renameValue, setRenameValue] = useState("");
   const [isMobile, setIsMobile] = useState(false);
+  const [feedback, setFeedback] = useState<Record<number, "up" | "down" | null>>({});
 
   useEffect(() => {
     const mq = window.matchMedia("(pointer: coarse)");
@@ -231,7 +234,7 @@ export default function ChatbotPage() {
   }
 
   return (
-    <div className="scoop-app" style={{ fontFamily: "var(--font-instrument), system-ui, sans-serif", background: bg, height: "100vh", display: "flex", flexDirection: "column", color: textPrimary, transition: "background 0.2s, color 0.2s", overflow: "hidden" }}>
+    <div className="scoop-app" style={{ fontFamily: "var(--font-instrument), system-ui, sans-serif", background: bg, height: "100dvh", display: "flex", flexDirection: "column", color: textPrimary, transition: "background 0.2s, color 0.2s", overflow: "hidden" }}>
 
       {/* ── Backdrop (sidebar + apps) ─────────────────────────── */}
       {(sidebarOpen || chatMenuOpen) && (
@@ -644,7 +647,7 @@ export default function ChatbotPage() {
               ><Icon name="mic" size={24} /></button>
               <button
                 onClick={() => thinking ? handleStop() : handleSend()}
-                style={{ width: isMobile ? 42 : 34, height: isMobile ? 42 : 34, borderRadius: r.md, background: "rgb(241,102,34)", border: "none", cursor: "pointer", display: "flex", alignItems: "center", justifyContent: "center", color: "#fff", transition: "background 0.15s", marginLeft: 8 }}
+                style={{ width: isMobile ? 42 : 34, height: isMobile ? 42 : 34, borderRadius: r.md, background: input.trim() ? "rgb(241,102,34)" : dark ? "#333" : "#e5e5e3", border: "none", cursor: input.trim() ? "pointer" : "default", display: "flex", alignItems: "center", justifyContent: "center", color: input.trim() ? "#fff" : textMuted, transition: "background 0.15s", marginLeft: 8 }}
               ><Icon name={thinking ? "stop" : "arrow_upward"} size={18} /></button>
             </div>
           </div>
@@ -667,6 +670,22 @@ export default function ChatbotPage() {
               // ── Assistant response ──────────────────────────────
               <div key={msg.id} style={{ paddingTop: 8, fontSize: 15, lineHeight: 1.7, color: textPrimary }}>
                 {formatContent(msg.content)}
+                <div style={{ display: "flex", gap: 4, marginTop: 10 }}>
+                  {(["up", "down"] as const).map(dir => {
+                    const active = feedback[msg.id] === dir;
+                    return (
+                      <button
+                        key={dir}
+                        onClick={() => setFeedback(prev => ({ ...prev, [msg.id]: prev[msg.id] === dir ? null : dir }))}
+                        style={{ width: 30, height: 30, borderRadius: r.md, border: "none", background: active ? hoverBg : "none", cursor: "pointer", display: "flex", alignItems: "center", justifyContent: "center", color: active ? textPrimary : textMuted, transition: "background 0.15s, color 0.15s" }}
+                        onMouseEnter={e => { if (!active) e.currentTarget.style.background = hoverBg; }}
+                        onMouseLeave={e => { if (!active) e.currentTarget.style.background = "none"; }}
+                      >
+                        <Icon name={dir === "up" ? "thumb_up" : "thumb_down"} size={16} />
+                      </button>
+                    );
+                  })}
+                </div>
               </div>
             )
           ))}
@@ -680,7 +699,7 @@ export default function ChatbotPage() {
         </div>
 
       </div>
-      <div style={{ background: bg, paddingBottom: 24, paddingTop: 8, flexShrink: 0 }}>
+      <div style={{ background: bg, paddingBottom: 12, paddingTop: 8, flexShrink: 0 }}>
         <div style={{ maxWidth: 760, width: "100%", margin: "0 auto", padding: "0 16px" }}>
           <div style={{ background: inputBg, border: `1.5px solid ${border}`, borderRadius: r.xl, boxShadow: dark ? "none" : "0 2px 12px rgba(0,0,0,0.06)" }}>
             <textarea
