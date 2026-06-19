@@ -632,7 +632,7 @@ export default function ChatbotPage() {
               onKeyDown={handleKeyDown}
               placeholder="Ask Scoop anything"
               rows={1}
-              style={{ width: "100%", background: "transparent", border: "none", outline: "none", resize: "none", fontSize: 15, lineHeight: 1.55, color: textPrimary, fontFamily: "inherit", padding: "16px 18px 0" }}
+              style={{ width: "100%", background: "transparent", border: "none", outline: "none", resize: "none", fontSize: 16, lineHeight: 1.55, color: textPrimary, fontFamily: "inherit", padding: "16px 18px 0" }}
             />
             <div style={{ display: "flex", alignItems: "center", padding: "6px 8px 14px" }}>
               {/* Discovery state: muted, no border */}
@@ -708,7 +708,7 @@ export default function ChatbotPage() {
               onKeyDown={handleKeyDown}
               placeholder="Ask Scoop anything"
               rows={1}
-              style={{ width: "100%", background: "transparent", border: "none", outline: "none", resize: "none", fontSize: 15, lineHeight: 1.55, color: textPrimary, fontFamily: "inherit", padding: "16px 18px 0" }}
+              style={{ width: "100%", background: "transparent", border: "none", outline: "none", resize: "none", fontSize: 16, lineHeight: 1.55, color: textPrimary, fontFamily: "inherit", padding: "16px 18px 0" }}
             />
             <div style={{ display: "flex", alignItems: "center", padding: "6px 8px 14px" }}>
               {/* Active conversation: icon only */}
