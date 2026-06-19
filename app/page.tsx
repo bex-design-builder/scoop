@@ -103,6 +103,15 @@ const ScrapIcon = () => (
   <img src="/logo.jpeg" alt="Scoop" width={32} height={32} style={{ borderRadius: 8, display: "block", objectFit: "cover" }} />
 );
 
+// ── Tooltip ──────────────────────────────────────────────────────────
+function Tooltip({ label, children, position = "bottom" }: { label: string; children: React.ReactNode; position?: "top" | "bottom" | "left" | "right" }) {
+  return (
+    <span className={`tt-wrap tt-${position}`} data-tip={label} style={{ position: "relative", display: "inline-flex" }}>
+      {children}
+    </span>
+  );
+}
+
 // ── Helpers ──────────────────────────────────────────────────────────
 
 function Avatar({ role }: { role: "user" | "assistant" }) {
@@ -267,9 +276,11 @@ export default function ChatbotPage() {
                 style={{ flex: 1, background: "transparent", border: "none", outline: "none", fontSize: 15, color: textPrimary, fontFamily: "inherit" }}
               />
               {chatsQuery && (
-                <button onClick={() => setChatsQuery("")} style={{ background: "none", border: "none", cursor: "pointer", color: textMuted, display: "flex", alignItems: "center", justifyContent: "center" }}>
-                  <Icon name="close" />
-                </button>
+                <Tooltip label="Clear" position="bottom">
+                  <button onClick={() => setChatsQuery("")} style={{ background: "none", border: "none", cursor: "pointer", color: textMuted, display: "flex", alignItems: "center", justifyContent: "center" }}>
+                    <Icon name="close" />
+                  </button>
+                </Tooltip>
               )}
             </div>
             <div style={{ maxHeight: 360, overflowY: "auto", padding: "6px 8px" }}>
@@ -350,14 +361,16 @@ export default function ChatbotPage() {
           >
             <span style={{ fontSize: 15, fontWeight: 600, color: textPrimary, letterSpacing: "-0.01em" }}>Scoop</span>
           </button>
-          <button
-            onClick={() => setSidebarOpen(false)}
-            style={{ background: "none", border: "none", cursor: "pointer", color: textMuted, padding: 6, borderRadius: r.sm, display: "flex", alignItems: "center", justifyContent: "center" }}
-            onMouseEnter={e => (e.currentTarget.style.background = hoverBg)}
-            onMouseLeave={e => (e.currentTarget.style.background = "none")}
-          >
-            <Icon name="close" />
-          </button>
+          <Tooltip label="Close sidebar" position="bottom">
+            <button
+              onClick={() => setSidebarOpen(false)}
+              style={{ background: "none", border: "none", cursor: "pointer", color: textMuted, padding: 6, borderRadius: r.sm, display: "flex", alignItems: "center", justifyContent: "center" }}
+              onMouseEnter={e => (e.currentTarget.style.background = hoverBg)}
+              onMouseLeave={e => (e.currentTarget.style.background = "none")}
+            >
+              <Icon name="close" />
+            </button>
+          </Tooltip>
         </div>
 
         {/* Nav items */}
@@ -556,14 +569,16 @@ export default function ChatbotPage() {
         style={{ background: bg, height: 52, display: "flex", alignItems: "center", paddingInline: "8px 16px", gap: 4, position: "sticky", top: 0, zIndex: 10, transition: "background 0.2s" }}
       >
         {/* Hamburger — sidebar only, no label */}
-        <button
-          onClick={() => openSidebar()}
-          style={{ color: textMuted, display: "flex", alignItems: "center", justifyContent: "center", background: "none", border: "none", cursor: "pointer", padding: "6px 8px", borderRadius: r.sm, minWidth: 48, minHeight: 48 }}
-          onMouseEnter={e => (e.currentTarget.style.background = hoverBg)}
-          onMouseLeave={e => (e.currentTarget.style.background = "none")}
-        >
-          <Icon name="menu" />
-        </button>
+        <Tooltip label="Open sidebar" position="bottom">
+          <button
+            onClick={() => openSidebar()}
+            style={{ color: textMuted, display: "flex", alignItems: "center", justifyContent: "center", background: "none", border: "none", cursor: "pointer", padding: "6px 8px", borderRadius: r.sm, minWidth: 48, minHeight: 48 }}
+            onMouseEnter={e => (e.currentTarget.style.background = hoverBg)}
+            onMouseLeave={e => (e.currentTarget.style.background = "none")}
+          >
+            <Icon name="menu" />
+          </button>
+        </Tooltip>
 
         {view === "home" ? (
           <button
@@ -657,14 +672,18 @@ export default function ChatbotPage() {
                 onMouseLeave={e => (e.currentTarget.style.background = "none")}
               ><Icon name="add" size={20} />Add file or photo</button>
               <div style={{ flex: 1 }} />
-              <button style={{ width: isMobile ? 48 : 34, height: isMobile ? 48 : 34, borderRadius: r.md, border: "none", background: "none", cursor: "pointer", display: "flex", alignItems: "center", justifyContent: "center", color: textMuted }}
-                onMouseEnter={e => (e.currentTarget.style.background = hoverBg)}
-                onMouseLeave={e => (e.currentTarget.style.background = "none")}
-              ><Icon name="mic" size={24} /></button>
-              <button
-                onClick={() => thinking ? handleStop() : handleSend()}
-                style={{ width: isMobile ? 48 : 34, height: isMobile ? 48 : 34, borderRadius: r.md, background: input.trim() ? "rgb(241,102,34)" : dark ? "#333" : "#e5e5e3", border: "none", cursor: input.trim() ? "pointer" : "default", display: "flex", alignItems: "center", justifyContent: "center", color: input.trim() ? "#fff" : textMuted, transition: "background 0.15s", marginLeft: 8 }}
-              ><Icon name={thinking ? "stop" : "arrow_upward"} size={18} /></button>
+              <Tooltip label="Voice input" position="top">
+                <button style={{ width: isMobile ? 48 : 34, height: isMobile ? 48 : 34, borderRadius: r.md, border: "none", background: "none", cursor: "pointer", display: "flex", alignItems: "center", justifyContent: "center", color: textMuted }}
+                  onMouseEnter={e => (e.currentTarget.style.background = hoverBg)}
+                  onMouseLeave={e => (e.currentTarget.style.background = "none")}
+                ><Icon name="mic" size={24} /></button>
+              </Tooltip>
+              <Tooltip label={thinking ? "Stop" : "Send"} position="top">
+                <button
+                  onClick={() => thinking ? handleStop() : handleSend()}
+                  style={{ width: isMobile ? 48 : 34, height: isMobile ? 48 : 34, borderRadius: r.md, background: input.trim() ? "rgb(241,102,34)" : dark ? "#333" : "#e5e5e3", border: "none", cursor: input.trim() ? "pointer" : "default", display: "flex", alignItems: "center", justifyContent: "center", color: input.trim() ? "#fff" : textMuted, transition: "background 0.15s", marginLeft: 8 }}
+                ><Icon name={thinking ? "stop" : "arrow_upward"} size={18} /></button>
+              </Tooltip>
             </div>
           </div>
         </div></div>
@@ -690,15 +709,16 @@ export default function ChatbotPage() {
                   {(["up", "down"] as const).map(dir => {
                     const active = feedback[msg.id] === dir;
                     return (
-                      <button
-                        key={dir}
-                        onClick={() => setFeedback(prev => ({ ...prev, [msg.id]: prev[msg.id] === dir ? null : dir }))}
-                        style={{ width: isMobile ? 48 : 30, height: isMobile ? 48 : 30, borderRadius: r.md, border: "none", background: active ? hoverBg : "none", cursor: "pointer", display: "flex", alignItems: "center", justifyContent: "center", color: active ? textPrimary : textMuted, transition: "background 0.15s, color 0.15s" }}
-                        onMouseEnter={e => { if (!active) e.currentTarget.style.background = hoverBg; }}
-                        onMouseLeave={e => { if (!active) e.currentTarget.style.background = "none"; }}
-                      >
-                        <Icon name={active ? (dir === "up" ? "thumb_up_filled" : "thumb_down_filled") : (dir === "up" ? "thumb_up" : "thumb_down")} size={16} />
-                      </button>
+                      <Tooltip key={dir} label={dir === "up" ? "Good response" : "Bad response"} position="bottom">
+                        <button
+                          onClick={() => setFeedback(prev => ({ ...prev, [msg.id]: prev[msg.id] === dir ? null : dir }))}
+                          style={{ width: isMobile ? 48 : 30, height: isMobile ? 48 : 30, borderRadius: r.md, border: "none", background: active ? hoverBg : "none", cursor: "pointer", display: "flex", alignItems: "center", justifyContent: "center", color: active ? textPrimary : textMuted, transition: "background 0.15s, color 0.15s" }}
+                          onMouseEnter={e => { if (!active) e.currentTarget.style.background = hoverBg; }}
+                          onMouseLeave={e => { if (!active) e.currentTarget.style.background = "none"; }}
+                        >
+                          <Icon name={active ? (dir === "up" ? "thumb_up_filled" : "thumb_down_filled") : (dir === "up" ? "thumb_up" : "thumb_down")} size={16} />
+                        </button>
+                      </Tooltip>
                     );
                   })}
                 </div>
@@ -728,19 +748,25 @@ export default function ChatbotPage() {
             />
             <div style={{ display: "flex", alignItems: "center", padding: "6px 8px 14px" }}>
               {/* Active conversation: icon only */}
-              <button style={{ width: isMobile ? 48 : 34, height: isMobile ? 48 : 34, borderRadius: r.md, border: "none", background: "none", cursor: "pointer", display: "flex", alignItems: "center", justifyContent: "center", color: textMuted }}
-                onMouseEnter={e => (e.currentTarget.style.background = hoverBg)}
-                onMouseLeave={e => (e.currentTarget.style.background = "none")}
-              ><Icon name="add" size={20} /></button>
+              <Tooltip label="Add file or photo" position="top">
+                <button style={{ width: isMobile ? 48 : 34, height: isMobile ? 48 : 34, borderRadius: r.md, border: "none", background: "none", cursor: "pointer", display: "flex", alignItems: "center", justifyContent: "center", color: textMuted }}
+                  onMouseEnter={e => (e.currentTarget.style.background = hoverBg)}
+                  onMouseLeave={e => (e.currentTarget.style.background = "none")}
+                ><Icon name="add" size={20} /></button>
+              </Tooltip>
               <div style={{ flex: 1 }} />
-              <button style={{ width: isMobile ? 48 : 34, height: isMobile ? 48 : 34, borderRadius: r.md, border: "none", background: "none", cursor: "pointer", display: "flex", alignItems: "center", justifyContent: "center", color: textMuted }}
-                onMouseEnter={e => (e.currentTarget.style.background = hoverBg)}
-                onMouseLeave={e => (e.currentTarget.style.background = "none")}
-              ><Icon name="mic" size={24} /></button>
-              <button
-                onClick={() => thinking ? handleStop() : handleSend()}
-                style={{ width: isMobile ? 42 : 34, height: isMobile ? 42 : 34, borderRadius: r.md, background: (thinking || input.trim()) ? "rgb(241,102,34)" : dark ? "#333" : "#e5e5e3", border: "none", cursor: (thinking || input.trim()) ? "pointer" : "default", display: "flex", alignItems: "center", justifyContent: "center", color: (thinking || input.trim()) ? "#fff" : textMuted, transition: "background 0.15s", marginLeft: 8 }}
-              ><Icon name={thinking ? "stop" : "arrow_upward"} size={18} /></button>
+              <Tooltip label="Voice input" position="top">
+                <button style={{ width: isMobile ? 48 : 34, height: isMobile ? 48 : 34, borderRadius: r.md, border: "none", background: "none", cursor: "pointer", display: "flex", alignItems: "center", justifyContent: "center", color: textMuted }}
+                  onMouseEnter={e => (e.currentTarget.style.background = hoverBg)}
+                  onMouseLeave={e => (e.currentTarget.style.background = "none")}
+                ><Icon name="mic" size={24} /></button>
+              </Tooltip>
+              <Tooltip label={thinking ? "Stop" : "Send"} position="top">
+                <button
+                  onClick={() => thinking ? handleStop() : handleSend()}
+                  style={{ width: isMobile ? 42 : 34, height: isMobile ? 42 : 34, borderRadius: r.md, background: (thinking || input.trim()) ? "rgb(241,102,34)" : dark ? "#333" : "#e5e5e3", border: "none", cursor: (thinking || input.trim()) ? "pointer" : "default", display: "flex", alignItems: "center", justifyContent: "center", color: (thinking || input.trim()) ? "#fff" : textMuted, transition: "background 0.15s", marginLeft: 8 }}
+                ><Icon name={thinking ? "stop" : "arrow_upward"} size={18} /></button>
+              </Tooltip>
             </div>
           </div>
         </div>
@@ -748,6 +774,30 @@ export default function ChatbotPage() {
       </div>}
 
       <style dangerouslySetInnerHTML={{ __html: `
+        @media (pointer: fine) {
+          .tt-wrap { display: inline-flex; }
+          .tt-wrap::after {
+            content: attr(data-tip);
+            position: absolute;
+            white-space: nowrap;
+            font-size: 12px;
+            font-weight: 500;
+            line-height: 1;
+            padding: 5px 8px;
+            border-radius: 5px;
+            background: rgba(30,30,30,0.88);
+            color: #fff;
+            pointer-events: none;
+            opacity: 0;
+            transition: opacity 0.12s;
+            z-index: 9999;
+          }
+          .tt-wrap:hover::after { opacity: 1; }
+          .tt-bottom::after { top: calc(100% + 6px); left: 50%; transform: translateX(-50%); }
+          .tt-top::after    { bottom: calc(100% + 6px); left: 50%; transform: translateX(-50%); }
+          .tt-right::after  { left: calc(100% + 6px); top: 50%; transform: translateY(-50%); }
+          .tt-left::after   { right: calc(100% + 6px); top: 50%; transform: translateY(-50%); }
+        }
         @keyframes pulse {
           0%, 100% { opacity: 0.4; }
           50% { opacity: 1; }
