@@ -78,6 +78,8 @@ const SVG_PATHS: Record<string, string> = {
   attach: "M720-330q0 104-73 177T470-80q-104 0-177-73t-73-177v-370q0-75 52.5-127.5T400-880q75 0 127.5 52.5T580-700v350q0 46-32 78t-78 32q-46 0-78-32t-32-78v-330q0-17 11.5-28.5T400-720q17 0 28.5 11.5T440-680v330q0 13 8.5 21.5T470-320q13 0 21.5-8.5T500-350v-350q-1-42-29.5-71T400-800q-42 0-71 29t-29 71v370q-1 71 49 120.5T470-160q70 0 119-49.5T640-330v-350q0-17 11.5-28.5T680-720q17 0 28.5 11.5T720-680v350Z",
   thumb_up: "M840-640q32 0 56 24t24 56v80q0 7-2 15t-4 15L794-168q-9 20-30 34t-44 14H280v-520l240-238q15-15 35.5-17.5T595-888q19 10 28 28t4 37l-45 183h258Zm-480 34v406h360l120-280v-80H480l54-220-174 174ZM160-120q-33 0-56.5-23.5T80-200v-360q0-33 23.5-56.5T160-640h120v80H160v360h120v80H160Zm200-80v-406 406Z",
   thumb_down: "M120-320q-32 0-56-24t-24-56v-80q0-7 2-15t4-15l120-282q9-20 30-34t44-14h440v520L440-82q-15 15-35.5 17.5T365-72q-19-10-28-28t-4-37l45-183H120Zm480-34v-406H240L120-480v80h360l-54 220 174-174Zm200-486q33 0 56.5 23.5T880-760v360q0 33-23.5 56.5T800-320H680v-80h120v-360H680v-80h120Zm-200 80v406-406Z",
+  thumb_up_filled: "M720-120H280v-520l240-238 50 50q7 7 11.5 19t4.5 23v14l-44 172h208q32 0 56 24t24 56v80q0 7-2 15t-4 15L794-168q-9 20-30 34t-44 14Zm-360-80h360l120-280v-80H480l54-220-174 174v406Zm0-406v406-406Zm-80-34v80H160v360h120v80H160q-33 0-56.5-23.5T80-200v-360q0-33 23.5-56.5T160-640h120Z",
+  thumb_down_filled: "M240-840h440v520L440-82q-15 15-35.5 17.5T365-72q-19-10-28-28t-4-37l45-183H120q-32 0-56-24t-24-56v-80q0-7 2-15t4-15l120-282q9-20 30-34t44-14Zm360 80H240L120-480v80h360l-54 220 174-174v-406Zm0 406v-406 406Zm80 34v-80h120v-360H680v-80h120q33 0 56.5 23.5T880-760v360q0 33-23.5 56.5T800-320H680Z",
 };
 
 function Icon({ name, size = ICON_SIZE, style = {} }: { name: string; size?: number; style?: React.CSSProperties }) {
@@ -341,7 +343,7 @@ export default function ChatbotPage() {
         <div style={{ height: 52, display: "flex", alignItems: "center", justifyContent: "space-between", paddingInline: 16, flexShrink: 0 }}>
           <button
             onClick={() => { setSidebarOpen(false); setView("home"); }}
-            style={{ display: "flex", alignItems: "center", gap: 8, background: "none", border: "none", cursor: "pointer", padding: "4px 6px", borderRadius: r.pill }}
+            style={{ display: "flex", alignItems: "center", gap: 8, background: "none", border: "none", cursor: "pointer", padding: "4px 6px", borderRadius: r.pill, minHeight: 48 }}
             onMouseEnter={e => (e.currentTarget.style.background = hoverBg)}
             onMouseLeave={e => (e.currentTarget.style.background = "none")}
           >
@@ -362,7 +364,7 @@ export default function ChatbotPage() {
           {/* New chat */}
           <button
             onClick={() => { setSidebarOpen(false); setView("home"); }}
-            style={{ width: "100%", display: "flex", alignItems: "center", gap: 10, padding: "8px 12px", minHeight: 40, borderRadius: r.md, border: "none", background: "none", cursor: "pointer", color: textPrimary, fontSize: 14, fontWeight: 400, textAlign: "left" }}
+            style={{ width: "100%", display: "flex", alignItems: "center", gap: 10, padding: "8px 12px", minHeight: 48, borderRadius: r.md, border: "none", background: "none", cursor: "pointer", color: textPrimary, fontSize: 14, fontWeight: 400, textAlign: "left" }}
             onMouseEnter={e => (e.currentTarget.style.background = hoverBg)}
             onMouseLeave={e => (e.currentTarget.style.background = "none")}
           >
@@ -388,7 +390,7 @@ export default function ChatbotPage() {
           <div style={{ marginBottom: 8 }}>
             <button
               onClick={() => setAppsOpen(o => !o)}
-              style={{ width: "100%", display: "flex", alignItems: "center", gap: 6, paddingInline: 12, minHeight: 36, borderRadius: r.md, border: "none", background: "none", cursor: "pointer", fontSize: 13, fontWeight: 500, letterSpacing: "0.02em", textTransform: "none" as const, color: textMuted, textAlign: "left" }}
+              style={{ width: "100%", display: "flex", alignItems: "center", gap: 6, paddingInline: 12, minHeight: 48, borderRadius: r.md, border: "none", background: "none", cursor: "pointer", fontSize: 13, fontWeight: 500, letterSpacing: "0.02em", textTransform: "none" as const, color: textMuted, textAlign: "left" }}
               onMouseEnter={e => (e.currentTarget.style.background = hoverBg)}
               onMouseLeave={e => (e.currentTarget.style.background = "none")}
             >
@@ -397,7 +399,7 @@ export default function ChatbotPage() {
             </button>
             {appsOpen && APPS[0].items.map(app => (
               <button key={app.name} onClick={() => setSidebarOpen(false)}
-                style={{ width: "100%", display: "flex", alignItems: "center", textAlign: "left", padding: "0 12px 0 20px", minHeight: 36, borderRadius: r.md, border: "none", background: "none", cursor: "pointer", fontSize: 14, color: textPrimary, whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis" }}
+                style={{ width: "100%", display: "flex", alignItems: "center", textAlign: "left", padding: "0 12px 0 20px", minHeight: 48, borderRadius: r.md, border: "none", background: "none", cursor: "pointer", fontSize: 14, color: textPrimary, whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis" }}
                 onMouseEnter={e => (e.currentTarget.style.background = hoverBg)}
                 onMouseLeave={e => (e.currentTarget.style.background = "none")}
               >{app.name}</button>
@@ -408,7 +410,7 @@ export default function ChatbotPage() {
           <div style={{ marginBottom: 8 }}>
             <button
               onClick={() => setDataSourcesOpen(o => !o)}
-              style={{ width: "100%", display: "flex", alignItems: "center", gap: 6, paddingInline: 12, minHeight: 36, borderRadius: r.md, border: "none", background: "none", cursor: "pointer", fontSize: 13, fontWeight: 500, letterSpacing: "0.02em", textTransform: "none" as const, color: textMuted, textAlign: "left" }}
+              style={{ width: "100%", display: "flex", alignItems: "center", gap: 6, paddingInline: 12, minHeight: 48, borderRadius: r.md, border: "none", background: "none", cursor: "pointer", fontSize: 13, fontWeight: 500, letterSpacing: "0.02em", textTransform: "none" as const, color: textMuted, textAlign: "left" }}
               onMouseEnter={e => (e.currentTarget.style.background = hoverBg)}
               onMouseLeave={e => (e.currentTarget.style.background = "none")}
             >
@@ -417,7 +419,7 @@ export default function ChatbotPage() {
             </button>
             {dataSourcesOpen && APPS[1].items.map(app => (
               <button key={app.name} onClick={() => setSidebarOpen(false)}
-                style={{ width: "100%", display: "flex", alignItems: "center", textAlign: "left", padding: "0 12px 0 20px", minHeight: 36, borderRadius: r.md, border: "none", background: "none", cursor: "pointer", fontSize: 14, color: textPrimary, whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis" }}
+                style={{ width: "100%", display: "flex", alignItems: "center", textAlign: "left", padding: "0 12px 0 20px", minHeight: 48, borderRadius: r.md, border: "none", background: "none", cursor: "pointer", fontSize: 14, color: textPrimary, whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis" }}
                 onMouseEnter={e => (e.currentTarget.style.background = hoverBg)}
                 onMouseLeave={e => (e.currentTarget.style.background = "none")}
               >{app.name}</button>
@@ -428,7 +430,7 @@ export default function ChatbotPage() {
           <div style={{ marginBottom: 8 }}>
             <button
               onClick={() => setDevToolsOpen(o => !o)}
-              style={{ width: "100%", display: "flex", alignItems: "center", gap: 6, paddingInline: 12, minHeight: 36, borderRadius: r.md, border: "none", background: "none", cursor: "pointer", fontSize: 13, fontWeight: 500, letterSpacing: "0.02em", textTransform: "none" as const, color: textMuted, textAlign: "left" }}
+              style={{ width: "100%", display: "flex", alignItems: "center", gap: 6, paddingInline: 12, minHeight: 48, borderRadius: r.md, border: "none", background: "none", cursor: "pointer", fontSize: 13, fontWeight: 500, letterSpacing: "0.02em", textTransform: "none" as const, color: textMuted, textAlign: "left" }}
               onMouseEnter={e => (e.currentTarget.style.background = hoverBg)}
               onMouseLeave={e => (e.currentTarget.style.background = "none")}
             >
@@ -439,7 +441,7 @@ export default function ChatbotPage() {
               <button
                 key={tool.name}
                 onClick={() => setSidebarOpen(false)}
-                style={{ width: "100%", display: "flex", alignItems: "center", textAlign: "left", padding: "0 12px 0 20px", minHeight: 36, borderRadius: r.md, border: "none", background: "none", cursor: "pointer", fontSize: 14, color: textPrimary, whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis" }}
+                style={{ width: "100%", display: "flex", alignItems: "center", textAlign: "left", padding: "0 12px 0 20px", minHeight: 48, borderRadius: r.md, border: "none", background: "none", cursor: "pointer", fontSize: 14, color: textPrimary, whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis" }}
                 onMouseEnter={e => (e.currentTarget.style.background = hoverBg)}
                 onMouseLeave={e => (e.currentTarget.style.background = "none")}
               >
@@ -452,7 +454,7 @@ export default function ChatbotPage() {
           <div style={{ marginBottom: 8 }}>
             <button
               onClick={() => setSettingsOpen(o => !o)}
-              style={{ width: "100%", display: "flex", alignItems: "center", gap: 6, paddingInline: 12, minHeight: 36, borderRadius: r.md, border: "none", background: "none", cursor: "pointer", fontSize: 13, fontWeight: 500, letterSpacing: "0.02em", textTransform: "none" as const, color: textMuted, textAlign: "left" }}
+              style={{ width: "100%", display: "flex", alignItems: "center", gap: 6, paddingInline: 12, minHeight: 48, borderRadius: r.md, border: "none", background: "none", cursor: "pointer", fontSize: 13, fontWeight: 500, letterSpacing: "0.02em", textTransform: "none" as const, color: textMuted, textAlign: "left" }}
               onMouseEnter={e => (e.currentTarget.style.background = hoverBg)}
               onMouseLeave={e => (e.currentTarget.style.background = "none")}
             >
@@ -494,7 +496,7 @@ export default function ChatbotPage() {
               <button
                 key={chat.id}
                 onClick={() => { setSidebarOpen(false); setView("chat"); }}
-                style={{ width: "100%", display: "flex", alignItems: "center", textAlign: "left", padding: "0 12px", minHeight: 36, borderRadius: r.md, border: "none", background: chat.id === "c1" ? hoverBg : "none", cursor: "pointer", fontSize: 14, color: textPrimary, whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis" }}
+                style={{ width: "100%", display: "flex", alignItems: "center", textAlign: "left", padding: "0 12px", minHeight: 48, borderRadius: r.md, border: "none", background: chat.id === "c1" ? hoverBg : "none", cursor: "pointer", fontSize: 14, color: textPrimary, whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis" }}
                 onMouseEnter={e => (e.currentTarget.style.background = hoverBg)}
                 onMouseLeave={e => (e.currentTarget.style.background = chat.id === "c1" ? hoverBg : "none")}
               >
@@ -511,7 +513,7 @@ export default function ChatbotPage() {
             <div style={{ position: "absolute", bottom: "calc(100% - 4px)", left: 8, right: 8, background: surface, border: `1px solid ${border}`, borderRadius: r.md, boxShadow: "0 8px 24px rgba(0,0,0,0.10)", zIndex: 40, padding: "4px 0", overflow: "hidden" }}>
               <button
                 onClick={() => setAccountMenuOpen(false)}
-                style={{ width: "100%", display: "flex", alignItems: "center", gap: 10, padding: "9px 14px", border: "none", background: "none", cursor: "pointer", color: "#c0392b", fontSize: 14, fontWeight: 400, textAlign: "left" }}
+                style={{ width: "100%", display: "flex", alignItems: "center", gap: 10, padding: "9px 14px", minHeight: 48, border: "none", background: "none", cursor: "pointer", color: "#c0392b", fontSize: 14, fontWeight: 400, textAlign: "left" }}
                 onMouseEnter={e => (e.currentTarget.style.background = hoverBg)}
                 onMouseLeave={e => (e.currentTarget.style.background = "none")}
               >
@@ -542,7 +544,7 @@ export default function ChatbotPage() {
         {/* Hamburger — sidebar only, no label */}
         <button
           onClick={() => openSidebar()}
-          style={{ color: textMuted, display: "flex", alignItems: "center", justifyContent: "center", background: "none", border: "none", cursor: "pointer", padding: "6px 8px", borderRadius: r.sm }}
+          style={{ color: textMuted, display: "flex", alignItems: "center", justifyContent: "center", background: "none", border: "none", cursor: "pointer", padding: "6px 8px", borderRadius: r.sm, minWidth: 48, minHeight: 48 }}
           onMouseEnter={e => (e.currentTarget.style.background = hoverBg)}
           onMouseLeave={e => (e.currentTarget.style.background = "none")}
         >
@@ -552,7 +554,7 @@ export default function ChatbotPage() {
         {view === "home" ? (
           <button
             onClick={() => setView("home")}
-            style={{ display: "flex", alignItems: "center", gap: 8, background: "none", border: "none", cursor: "pointer", padding: "4px 6px", borderRadius: r.pill }}
+            style={{ display: "flex", alignItems: "center", gap: 8, background: "none", border: "none", cursor: "pointer", padding: "4px 6px", borderRadius: r.pill, minHeight: 48 }}
             onMouseEnter={e => (e.currentTarget.style.background = hoverBg)}
             onMouseLeave={e => (e.currentTarget.style.background = "none")}
           >
@@ -563,7 +565,7 @@ export default function ChatbotPage() {
           <div style={{ position: "relative" }}>
             <button
               onClick={() => setChatMenuOpen(o => !o)}
-              style={{ display: "flex", alignItems: "center", gap: 6, background: chatMenuOpen ? hoverBg : "none", border: "none", cursor: "pointer", padding: "5px 10px", borderRadius: r.pill, color: textPrimary, fontSize: 14, fontWeight: 500 }}
+              style={{ display: "flex", alignItems: "center", gap: 6, background: chatMenuOpen ? hoverBg : "none", border: "none", cursor: "pointer", padding: "5px 10px", borderRadius: r.pill, color: textPrimary, fontSize: 14, fontWeight: 500, minHeight: 48 }}
               onMouseEnter={e => (e.currentTarget.style.background = hoverBg)}
               onMouseLeave={e => (e.currentTarget.style.background = chatMenuOpen ? hoverBg : "none")}
             >
@@ -574,7 +576,7 @@ export default function ChatbotPage() {
               <div style={{ position: "absolute", top: "calc(100% + 6px)", left: 0, background: surface, border: `1px solid ${border}`, borderRadius: r.md, boxShadow: "0 8px 24px rgba(0,0,0,0.10)", zIndex: 40, minWidth: 160, padding: "4px 0", overflow: "hidden" }}>
                 <button
                   onClick={() => { setChatMenuOpen(false); setRenameValue(chatTitle); setRenameOpen(true); }}
-                  style={{ width: "100%", display: "flex", alignItems: "center", gap: 10, padding: "9px 14px", border: "none", background: "none", cursor: "pointer", color: textMuted, fontSize: 14, fontWeight: 400, textAlign: "left" }}
+                  style={{ width: "100%", display: "flex", alignItems: "center", gap: 10, padding: "9px 14px", minHeight: 48, border: "none", background: "none", cursor: "pointer", color: textMuted, fontSize: 14, fontWeight: 400, textAlign: "left" }}
                   onMouseEnter={e => (e.currentTarget.style.background = hoverBg)}
                   onMouseLeave={e => (e.currentTarget.style.background = "none")}
                 >
@@ -583,7 +585,7 @@ export default function ChatbotPage() {
                 </button>
                 <button
                   onClick={() => { setChatMenuOpen(false); setChatTitle("Garage door recommendations"); setView("home"); }}
-                  style={{ width: "100%", display: "flex", alignItems: "center", gap: 10, padding: "9px 14px", border: "none", background: "none", cursor: "pointer", color: "#c0392b", fontSize: 14, fontWeight: 400, textAlign: "left" }}
+                  style={{ width: "100%", display: "flex", alignItems: "center", gap: 10, padding: "9px 14px", minHeight: 48, border: "none", background: "none", cursor: "pointer", color: "#c0392b", fontSize: 14, fontWeight: 400, textAlign: "left" }}
                   onMouseEnter={e => (e.currentTarget.style.background = hoverBg)}
                   onMouseLeave={e => (e.currentTarget.style.background = "none")}
                 >
@@ -616,7 +618,7 @@ export default function ChatbotPage() {
               <button
                 key={s.title}
                 onClick={() => sendSuggestion(s.title, s.reply)}
-                style={{ textAlign: "left", padding: isMobile ? "0 14px" : "7px 14px", minHeight: isMobile ? 42 : "auto", borderRadius: r.lg, border: "none", background: dark ? "#2a2a2a" : "#edecea", cursor: "pointer", fontFamily: "inherit", boxShadow: dark ? "none" : "0 1px 4px rgba(0,0,0,0.08)" }}
+                style={{ textAlign: "left", padding: isMobile ? "0 14px" : "7px 14px", minHeight: isMobile ? 48 : "auto", borderRadius: r.lg, border: "none", background: dark ? "#2a2a2a" : "#edecea", cursor: "pointer", fontFamily: "inherit", boxShadow: dark ? "none" : "0 1px 4px rgba(0,0,0,0.08)" }}
                 onMouseEnter={e => (e.currentTarget.style.borderColor = dark ? "#555" : "#ccc")}
                 onMouseLeave={e => (e.currentTarget.style.borderColor = border)}
               >
@@ -636,18 +638,18 @@ export default function ChatbotPage() {
             />
             <div style={{ display: "flex", alignItems: "center", padding: "6px 8px 14px" }}>
               {/* Discovery state: muted, no border */}
-              <button style={{ height: isMobile ? 40 : 34, padding: "0 8px", borderRadius: r.md, border: "none", background: "none", cursor: "pointer", display: "flex", alignItems: "center", gap: 4, color: textMuted, fontSize: 13, fontWeight: 500, whiteSpace: "nowrap" }}
+              <button style={{ height: isMobile ? 48 : 34, padding: "0 8px", borderRadius: r.md, border: "none", background: "none", cursor: "pointer", display: "flex", alignItems: "center", gap: 4, color: textMuted, fontSize: 13, fontWeight: 500, whiteSpace: "nowrap" }}
                 onMouseEnter={e => (e.currentTarget.style.background = hoverBg)}
                 onMouseLeave={e => (e.currentTarget.style.background = "none")}
               ><Icon name="add" size={20} />Add file or photo</button>
               <div style={{ flex: 1 }} />
-              <button style={{ width: isMobile ? 42 : 34, height: isMobile ? 42 : 34, borderRadius: r.md, border: "none", background: "none", cursor: "pointer", display: "flex", alignItems: "center", justifyContent: "center", color: textMuted }}
+              <button style={{ width: isMobile ? 48 : 34, height: isMobile ? 48 : 34, borderRadius: r.md, border: "none", background: "none", cursor: "pointer", display: "flex", alignItems: "center", justifyContent: "center", color: textMuted }}
                 onMouseEnter={e => (e.currentTarget.style.background = hoverBg)}
                 onMouseLeave={e => (e.currentTarget.style.background = "none")}
               ><Icon name="mic" size={24} /></button>
               <button
                 onClick={() => thinking ? handleStop() : handleSend()}
-                style={{ width: isMobile ? 42 : 34, height: isMobile ? 42 : 34, borderRadius: r.md, background: input.trim() ? "rgb(241,102,34)" : dark ? "#333" : "#e5e5e3", border: "none", cursor: input.trim() ? "pointer" : "default", display: "flex", alignItems: "center", justifyContent: "center", color: input.trim() ? "#fff" : textMuted, transition: "background 0.15s", marginLeft: 8 }}
+                style={{ width: isMobile ? 48 : 34, height: isMobile ? 48 : 34, borderRadius: r.md, background: input.trim() ? "rgb(241,102,34)" : dark ? "#333" : "#e5e5e3", border: "none", cursor: input.trim() ? "pointer" : "default", display: "flex", alignItems: "center", justifyContent: "center", color: input.trim() ? "#fff" : textMuted, transition: "background 0.15s", marginLeft: 8 }}
               ><Icon name={thinking ? "stop" : "arrow_upward"} size={18} /></button>
             </div>
           </div>
@@ -670,18 +672,18 @@ export default function ChatbotPage() {
               // ── Assistant response ──────────────────────────────
               <div key={msg.id} style={{ paddingTop: 8, fontSize: 15, lineHeight: 1.7, color: textPrimary }}>
                 {formatContent(msg.content)}
-                <div style={{ display: "flex", gap: 4, marginTop: 10 }}>
+                <div style={{ display: "flex", gap: isMobile ? 8 : 4, marginTop: 10 }}>
                   {(["up", "down"] as const).map(dir => {
                     const active = feedback[msg.id] === dir;
                     return (
                       <button
                         key={dir}
                         onClick={() => setFeedback(prev => ({ ...prev, [msg.id]: prev[msg.id] === dir ? null : dir }))}
-                        style={{ width: 30, height: 30, borderRadius: r.md, border: "none", background: active ? hoverBg : "none", cursor: "pointer", display: "flex", alignItems: "center", justifyContent: "center", color: active ? textPrimary : textMuted, transition: "background 0.15s, color 0.15s" }}
+                        style={{ width: isMobile ? 48 : 30, height: isMobile ? 48 : 30, borderRadius: r.md, border: "none", background: active ? hoverBg : "none", cursor: "pointer", display: "flex", alignItems: "center", justifyContent: "center", color: active ? textPrimary : textMuted, transition: "background 0.15s, color 0.15s" }}
                         onMouseEnter={e => { if (!active) e.currentTarget.style.background = hoverBg; }}
                         onMouseLeave={e => { if (!active) e.currentTarget.style.background = "none"; }}
                       >
-                        <Icon name={dir === "up" ? "thumb_up" : "thumb_down"} size={16} />
+                        <Icon name={active ? (dir === "up" ? "thumb_up_filled" : "thumb_down_filled") : (dir === "up" ? "thumb_up" : "thumb_down")} size={16} />
                       </button>
                     );
                   })}
@@ -712,12 +714,12 @@ export default function ChatbotPage() {
             />
             <div style={{ display: "flex", alignItems: "center", padding: "6px 8px 14px" }}>
               {/* Active conversation: icon only */}
-              <button style={{ width: isMobile ? 42 : 34, height: isMobile ? 42 : 34, borderRadius: r.md, border: "none", background: "none", cursor: "pointer", display: "flex", alignItems: "center", justifyContent: "center", color: textMuted }}
+              <button style={{ width: isMobile ? 48 : 34, height: isMobile ? 48 : 34, borderRadius: r.md, border: "none", background: "none", cursor: "pointer", display: "flex", alignItems: "center", justifyContent: "center", color: textMuted }}
                 onMouseEnter={e => (e.currentTarget.style.background = hoverBg)}
                 onMouseLeave={e => (e.currentTarget.style.background = "none")}
               ><Icon name="add" size={20} /></button>
               <div style={{ flex: 1 }} />
-              <button style={{ width: isMobile ? 42 : 34, height: isMobile ? 42 : 34, borderRadius: r.md, border: "none", background: "none", cursor: "pointer", display: "flex", alignItems: "center", justifyContent: "center", color: textMuted }}
+              <button style={{ width: isMobile ? 48 : 34, height: isMobile ? 48 : 34, borderRadius: r.md, border: "none", background: "none", cursor: "pointer", display: "flex", alignItems: "center", justifyContent: "center", color: textMuted }}
                 onMouseEnter={e => (e.currentTarget.style.background = hoverBg)}
                 onMouseLeave={e => (e.currentTarget.style.background = "none")}
               ><Icon name="mic" size={24} /></button>
