@@ -850,7 +850,7 @@ export default function ChatbotPage() {
                           setCopiedMsgId(msg.id);
                           setTimeout(() => setCopiedMsgId(null), 1500);
                         }}
-                        style={{ width: isMobile ? 32 : 30, height: isMobile ? 32 : 30, borderRadius: r.sm, border: "none", background: "none", cursor: "pointer", display: "flex", alignItems: "center", justifyContent: "center", color: copiedMsgId === msg.id ? "rgb(241,102,34)" : textMuted, transition: "color 0.15s" }}
+                        style={{ width: isMobile ? 48 : 30, height: isMobile ? 48 : 30, borderRadius: r.sm, border: "none", background: "none", cursor: "pointer", display: "flex", alignItems: "center", justifyContent: "center", color: copiedMsgId === msg.id ? "rgb(241,102,34)" : textMuted, transition: "color 0.15s" }}
                         onMouseEnter={e => e.currentTarget.style.background = hoverBg}
                         onMouseLeave={e => e.currentTarget.style.background = "none"}
                       >
@@ -861,7 +861,7 @@ export default function ChatbotPage() {
                       <button
                         aria-label="Edit message"
                         onClick={() => { setEditingMsgId(msg.id); setEditValue(msg.content); }}
-                        style={{ width: isMobile ? 32 : 30, height: isMobile ? 32 : 30, borderRadius: r.sm, border: "none", background: "none", cursor: "pointer", display: "flex", alignItems: "center", justifyContent: "center", color: textMuted }}
+                        style={{ width: isMobile ? 48 : 30, height: isMobile ? 48 : 30, borderRadius: r.sm, border: "none", background: "none", cursor: "pointer", display: "flex", alignItems: "center", justifyContent: "center", color: textMuted }}
                         onMouseEnter={e => e.currentTarget.style.background = hoverBg}
                         onMouseLeave={e => e.currentTarget.style.background = "none"}
                       >
