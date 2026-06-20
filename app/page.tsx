@@ -9,6 +9,14 @@ type Message = {
   muted?: boolean;
 };
 
+const EXAMPLE_PROMPTS = [
+  "Oil filter part number for asset 680036",
+  "JCB 510-56 — fault code 7F1F0394",
+  "250-hour service filters for asset 452013",
+  "What engine is in asset 616437?",
+  "Service manual for a Genie GS-4655",
+];
+
 const SAMPLE_MESSAGES: Message[] = [
   { id: 1, role: "user", content: "What's causing fault code P0128 on asset #ECX-4471?" },
   {
@@ -64,7 +72,8 @@ const DOCS_MESSAGES: Message[] = [
   { id: 101, role: "user", content: "Can you give me a full overview of how this app works?" },
   {
     id: 102, role: "assistant",
-    content: "Here's a full rundown of Scoop — how it's structured, how each feature works, and things to know before making changes.\n\n---\n\n**App structure**\n\nThe app has two screens: a **home screen** and a **chat screen**. The user starts on the home screen and moves into the chat once they send a message or tap a quick-start button.\n\nThe home screen is a calm landing state — a headline, a short description, four quick-start buttons, and an input field. Nothing is open by default.\n\nOnce a conversation is underway, the screen shifts to a three-layer layout:\n- The **header bar** at the top — always fixed. Shows the menu icon and the current conversation title.\n- The **message area** in the middle — the only part that scrolls. New messages appear at the bottom and the view follows them automatically.\n- The **input bar** at the bottom — always fixed. The user can always reach it without scrolling, no matter how long the conversation gets.\n\nIf the user types a long message, the input bar grows upward into the message area — nothing overlaps. It expands up to around 7–8 lines, then becomes scrollable internally. The send and mic buttons stay anchored to the bottom of the input bar as it grows.\n\n---\n\n**Quick-start buttons**\n\nBelow the headline on the home screen are four suggestion buttons — Find a part, Diagnose an issue, Find a service kit, and Find a manual. Tapping one immediately sends a pre-written message on the user's behalf and triggers a contextually relevant response from Scoop — the conversation starts instantly, without a blank screen moment.\n\nThe intent is that the response feels like a natural opening to a real conversation, not a canned FAQ answer. As the product develops, these responses should prompt the user to give more detail (like an asset number or fault code) rather than trying to answer in full without enough information.\n\n---\n\n**Side menu**\n\nThe side menu slides in from the left when the user taps the menu icon in the top-left corner. A semi-transparent overlay covers the rest of the screen — tapping it closes the menu.\n\nNavigation is organised into collapsible sections so it doesn't feel overwhelming:\n- **New chat** — returns to the home screen\n- **Search chats** — opens a focused search overlay that filters conversations in real time as the user types. Tapping a result opens that conversation. Escape or tapping outside closes it.\n- **My tools** — connected integrations (named 'My tools' rather than 'Apps' — language that feels natural to a field technician)\n- **My data** — connected data sources, using plain language rather than 'Data sources'\n- **Dev tools** — visible during development/testing\n- **Settings** — appearance, language, and font preferences\n- **Recent conversations** — list of past chats. The active one is highlighted. Each has a three-dot menu on hover/long-press with options to rename or delete.\n- **Account** (pinned to bottom) — name and email. Tapping reveals a log out option.\n\n---\n\n**Rename a conversation**\n\nFrom the three-dot menu on any recent conversation, the user can rename it. This opens a modal with the current title pre-filled — so they can edit rather than retype. Saving updates the title in both the header and the recents list. Cancel or Escape closes without any change.\n\n---\n\n**Mobile behaviours**\n\nMobile is detected by whether the device uses a touch pointer — not by screen width. A tablet with a keyboard attached is treated as a desktop.\n\n- Every tappable element is at least 48×48px on touch devices, with at least 8px between adjacent targets\n- Input text is 16px — anything smaller triggers iOS Safari auto-zoom on focus\n- The app uses a modern viewport unit that accounts for the browser's address bar and bottom chrome on mobile\n- On mobile, Enter adds a new line. On desktop, Enter sends; Shift+Enter adds a new line.\n\n---\n\n**Accessibility (WCAG 2.1 AA)**\n\n- All text meets minimum 4.5:1 contrast ratio against its background\n- Escape closes the sidebar, menus, and modals\n- Tab is trapped inside open modals so focus can't escape behind the overlay\n- Every interactive element shows a visible orange focus ring when reached by keyboard\n- Every icon-only button has a screen reader label\n- Collapsible sections, menus, and modals use the correct ARIA roles and states\n- The sidebar is hidden from screen readers when closed\n- An announcement region notifies screen readers when Scoop is thinking or a new response arrives\n- All animations are disabled for users who have reduced motion turned on\n\n---\n\n**Things to know before making changes**\n\n- Tooltips are desktop-only — they appear on hover for mouse/trackpad users and are hidden on touch screens entirely\n- User messages in the chat show Copy and Edit buttons. On desktop they appear on hover; on mobile they're always visible. Copy writes the message to the clipboard and confirms with a checkmark icon. Edit opens an inline text field spanning the full conversation width, pre-filled with the message — the user can make changes and tap Send to update it, or Cancel to close without saving. Enter sends on desktop; Escape cancels.\n- The delete confirmation modal is intentional — the action is irreversible and the extra step prevents accidents",
+    content: "Here's a full rundown of Scoop — how it's structured, how each feature works, and things to know before making changes.\n\n---\n\n**App structure**\n\nThe app has two screens: a **home screen** and a **chat screen**. The user starts on the home screen and moves into the chat once they send a message or tap a quick-start button.\n\nThe home screen is a calm landing state — a headline, a short description, four quick-start buttons, and an input field. Nothing is open by default.\n\nOnce a conversation is underway, the screen shifts to a three-layer layout:\n- The **header bar** at the top — always fixed. Shows the menu icon and the current conversation title.\n- The **message area** in the middle — the only part that scrolls. New messages appear at the bottom and the view follows them automatically.\n- The **input bar** at the bottom — always fixed. The user can always reach it without scrolling, no matter how long the conversation gets.\n\nIf the user types a long message, the input bar grows upward into the message area — nothing overlaps. It expands up to around 7–8 lines, then becomes scrollable internally. The send and mic buttons stay anchored to the bottom of the input bar as it grows.\n\n---\n\n**Quick-start buttons**\n\nBelow the headline on the home screen are four suggestion buttons — Find a part, Diagnose an issue, Find a service kit, and Find a manual. Tapping one immediately sends a pre-written message on the user's behalf and triggers a contextually relevant response from Scoop — the conversation starts instantly, without a blank screen moment.\n\nThe intent is that the response feels like a natural opening to a real conversation, not a canned FAQ answer. As the product develops, these responses should prompt the user to give more detail (like an asset number or fault code) rather than trying to answer in full without enough information.\n\n---\n\n**Side menu**\n\nThe side menu slides in from the left when the user taps the menu icon in the top-left corner. A semi-transparent overlay covers the rest of the screen — tapping it closes the menu.\n\nNavigation is organised into collapsible sections so it doesn't feel overwhelming:\n- **New chat** — returns to the home screen\n- **Search chats** — opens a focused search overlay that filters conversations in real time as the user types. Tapping a result opens that conversation. Escape or tapping outside closes it.\n- **My tools** — connected integrations (named 'My tools' rather than 'Apps' — language that feels natural to a field technician)\n- **My data** — connected data sources, using plain language rather than 'Data sources'\n- **Dev tools** — visible during development/testing\n- **Settings** — appearance, language, and font preferences\n- **Recent conversations** — list of past chats. The active one is highlighted. Each has a three-dot menu on hover/long-press with options to rename or delete.\n- **Account** (pinned to bottom) — name and email. Tapping reveals a log out option.\n\n---\n\n**Rename a conversation**\n\nFrom the three-dot menu on any recent conversation, the user can rename it. This opens a modal with the current title pre-filled — so they can edit rather than retype. Saving updates the title in both the header and the recents list. Cancel or Escape closes without any change.\n\n---\n\n**Mobile behaviours**\n\nMobile is detected by whether the device uses a touch pointer — not by screen width. A tablet with a keyboard attached is treated as a desktop.\n\n- Every tappable element is at least 48×48px on touch devices, with at least 8px between adjacent targets\n- Input text is 16px — anything smaller triggers iOS Safari auto-zoom on focus\n- The app uses a modern viewport unit that accounts for the browser's address bar and bottom chrome on mobile\n- On mobile, Enter adds a new line. On desktop, Enter sends; Shift+Enter adds a new line.\n\n---\n\n**Accessibility (WCAG 2.1 AA)**\n\n- All text meets minimum 4.5:1 contrast ratio against its background\n- Escape closes the sidebar, menus, and modals\n- Tab is trapped inside open modals so focus can't escape behind the overlay\n- Every interactive element shows a visible orange focus ring when reached by keyboard\n- Every icon-only button has a screen reader label\n- Collapsible sections, menus, and modals use the correct ARIA roles and states\n- The sidebar is hidden from screen readers when closed\n- An announcement region notifies screen readers when Scoop is thinking or a new response arrives\n- All animations are disabled for users who have reduced motion turned on\n\n---\n\n**Things to know before making changes**\n\n- Tooltips are desktop-only — they appear on hover for mouse/trackpad users and are hidden on touch screens entirely\n- User messages in the chat show Copy and Edit buttons. On desktop they appear on hover; on mobile they're always visible. Copy writes the message to the clipboard and confirms with a checkmark icon. Edit opens an inline text field spanning the full conversation width, pre-filled with the message — the user can make changes and tap Send to update it, or Cancel to close without saving. Enter sends on desktop; Escape cancels.\n- The delete confirmation modal is intentional — the action is irreversible and the extra step prevents accidents
+- Below the input on the home screen is a collapsed "Not sure what to ask?" disclosure. Tapping it reveals a divider labelled "Try these examples" and a list of 5 real-world example queries. Tapping any inserts the text into the input field so the user can edit it before sending. The examples are stored as a simple array at the top of the file — copy can be updated without touching any other code. This section is only visible on the home screen and disappears once a conversation starts.",
   },
 ];
 
@@ -205,6 +214,7 @@ export default function ChatbotPage() {
   const [editingMsgId, setEditingMsgId] = useState<number | null>(null);
   const [editValue, setEditValue] = useState("");
   const [copiedMsgId, setCopiedMsgId] = useState<number | null>(null);
+  const [examplesOpen, setExamplesOpen] = useState(false);
   const homeTextareaRef = useRef<HTMLTextAreaElement>(null);
   const chatTextareaRef = useRef<HTMLTextAreaElement>(null);
 
@@ -234,6 +244,7 @@ export default function ChatbotPage() {
   }, [input]);
 
   function handleSend() {
+    setInput("");
     setView("chat");
     setThinking(true);
     setTimeout(() => setThinking(false), 3000);
@@ -333,7 +344,7 @@ export default function ChatbotPage() {
                 value={chatsQuery}
                 onChange={e => setChatsQuery(e.target.value)}
                 placeholder="Search chats…"
-                style={{ flex: 1, background: "transparent", border: "none", outline: "none", fontSize: 15, color: textPrimary, fontFamily: "inherit" }}
+                style={{ flex: 1, background: "transparent", border: "none", outline: "none", fontSize: 16, color: textPrimary, fontFamily: "inherit" }}
               />
               {chatsQuery && (
                 <Tooltip label="Clear" position="bottom">
@@ -746,10 +757,10 @@ export default function ChatbotPage() {
         <div style={{ flex: 1, overflowY: "auto", display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center" }}>
         <div style={{ maxWidth: 680, width: "100%", padding: "0 16px 80px" }}>
           <div style={{ marginBottom: 32, textAlign: "center" }}>
-            <h2 style={{ fontSize: 36, fontWeight: 600, color: textPrimary, letterSpacing: ls.heading, lineHeight: 1.2, marginBottom: 12 }}>Ask about any part,<br />fault, or service.</h2>
+            <h2 style={{ fontSize: 42, fontWeight: 600, color: textPrimary, letterSpacing: ls.heading, lineHeight: 1.2, marginBottom: 12 }}>Ask about any part,<br />fault, or service.</h2>
             <p style={{ fontSize: 15, color: textMuted, lineHeight: 1.5, maxWidth: isMobile ? 220 : "none", margin: "0 auto" }}>Scoop pulls from your manuals, work orders, and fleet data.</p>
           </div>
-          <div style={{ display: "flex", flexWrap: "wrap", gap: 8, width: "100%", marginBottom: 32, justifyContent: "center" }}>
+          <div style={{ display: "flex", flexWrap: "wrap", gap: 8, width: "100%", marginBottom: 16, justifyContent: "center" }}>
             {[
               { title: "Find a part", reply: "Sure — what part, and which asset or model is it for?" },
               { title: "Diagnose an issue", reply: "Got a fault code? Paste it. Otherwise tell me what it's doing and which asset (e.g. won't start, 451123)." },
@@ -759,7 +770,7 @@ export default function ChatbotPage() {
               <button
                 key={s.title}
                 onClick={() => sendSuggestion(s.title, s.reply)}
-                style={{ textAlign: "left", padding: isMobile ? "0 14px" : "7px 14px", minHeight: isMobile ? 48 : "auto", borderRadius: r.lg, border: "none", background: dark ? "#2a2a2a" : "#edecea", cursor: "pointer", fontFamily: "inherit", boxShadow: dark ? "none" : "0 1px 4px rgba(0,0,0,0.08)" }}
+                style={{ textAlign: "left", padding: isMobile ? "0 14px" : "7px 14px", minHeight: isMobile ? 48 : "auto", borderRadius: r.lg, border: `1.5px solid ${border}`, background: dark ? "#2a2a2a" : "#f7f6f4", cursor: "pointer", fontFamily: "inherit", color: textPrimary, boxShadow: dark ? "none" : "0 1px 4px rgba(0,0,0,0.07)" }}
                 onMouseEnter={e => (e.currentTarget.style.borderColor = dark ? "#555" : "#ccc")}
                 onMouseLeave={e => (e.currentTarget.style.borderColor = border)}
               >
@@ -800,6 +811,42 @@ export default function ChatbotPage() {
               </Tooltip>
             </div>
           </div>
+
+          {/* Not sure what to ask? disclosure */}
+          <div style={{ marginTop: 16, width: "100%", display: "flex", flexDirection: "column", alignItems: "center" }}>
+            <button
+              aria-expanded={examplesOpen}
+              onClick={() => setExamplesOpen(o => !o)}
+              style={{ display: "flex", alignItems: "center", gap: 6, background: "none", border: "none", cursor: "pointer", padding: "4px 0", color: textMuted, fontSize: 14 }}
+              onMouseEnter={e => e.currentTarget.style.color = textPrimary}
+              onMouseLeave={e => e.currentTarget.style.color = textMuted}
+            >
+              Not sure what to ask?
+              <Icon name="expand_more" size={18} style={{ transform: examplesOpen ? "rotate(0deg)" : "rotate(-90deg)", transition: "transform 0.2s" }} />
+            </button>
+            {examplesOpen && (
+              <div style={{ display: "flex", flexDirection: "column", marginTop: 12, gap: 4 }}>
+                <div style={{ display: "flex", alignItems: "center", gap: 10, marginBottom: 8 }}>
+                  <div style={{ flex: 1, height: 1, background: border }} />
+                  <span style={{ fontSize: 12, color: textMuted, fontWeight: 500, letterSpacing: ls.label, whiteSpace: "nowrap" }}>Try these examples</span>
+                  <div style={{ flex: 1, height: 1, background: border }} />
+                </div>
+                {EXAMPLE_PROMPTS.map(prompt => (
+                  <button
+                    key={prompt}
+                    onClick={() => { setInput(prompt); setExamplesOpen(false); homeTextareaRef.current?.focus(); }}
+                    style={{ textAlign: "left", background: "none", border: "none", cursor: "pointer", padding: "8px 10px", fontSize: 14, color: textMuted, fontFamily: "inherit", borderRadius: r.sm, minHeight: isMobile ? 48 : "auto", display: "flex", alignItems: "center", gap: 8, width: "100%" }}
+                    onMouseEnter={e => { e.currentTarget.style.color = textPrimary; e.currentTarget.style.background = hoverBg; }}
+                    onMouseLeave={e => { e.currentTarget.style.color = textMuted; e.currentTarget.style.background = "none"; }}
+                  >
+                    <span style={{ flex: 1 }}>{prompt}</span>
+                    <span style={{ flexShrink: 0, opacity: 0.5, fontSize: 13, display: "flex", alignItems: "center", gap: 3 }}>Use this ↵</span>
+                  </button>
+                ))}
+              </div>
+            )}
+          </div>
+
         </div></div>
       )}
 
@@ -875,7 +922,7 @@ export default function ChatbotPage() {
               // ── Assistant response ──────────────────────────────
               <div key={msg.id} style={{ paddingTop: 8, fontSize: 16, fontWeight: 500, letterSpacing: ls.body, lineHeight: 1.7, color: msg.muted ? textMuted : textPrimary }}>
                 {formatContent(msg.content)}
-                <div style={{ display: "flex", gap: isMobile ? 8 : 4, marginTop: 10 }}>
+                {!msg.muted && <div style={{ display: "flex", gap: isMobile ? 8 : 4, marginTop: 10 }}>
                   {(["up", "down"] as const).map(dir => {
                     const active = feedback[msg.id] === dir;
                     return (
@@ -893,7 +940,7 @@ export default function ChatbotPage() {
                       </Tooltip>
                     );
                   })}
-                </div>
+                </div>}
               </div>
             )
           ))}
