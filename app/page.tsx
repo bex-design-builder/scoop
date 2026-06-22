@@ -773,7 +773,7 @@ export default function ChatbotPage() {
                 onMouseEnter={e => (e.currentTarget.style.borderColor = dark ? "#555" : "#ccc")}
                 onMouseLeave={e => (e.currentTarget.style.borderColor = border)}
               >
-                <p style={{ whiteSpace: "nowrap", fontSize: 14 }}>{s.title}</p>
+                <p style={{ whiteSpace: "nowrap", fontSize: 14, color: textPrimary }}>{s.title}</p>
               </button>
             ))}
           </div>
