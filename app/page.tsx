@@ -188,7 +188,7 @@ function formatContent(content: string) {
 
 export default function ChatbotPage() {
   const [dark, setDark] = useState(false);
-  const [useInter, setUseInter] = useState(false);
+  const [useInter, setUseInter] = useState(true);
   const [input, setInput] = useState("");
   const [messages, setMessages] = useState<Message[]>(SAMPLE_MESSAGES);
   const [sidebarOpen, setSidebarOpen] = useState(false);
