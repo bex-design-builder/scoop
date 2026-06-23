@@ -96,10 +96,12 @@ const SVG_PATHS: Record<string, string> = {
   attach: "M720-330q0 104-73 177T470-80q-104 0-177-73t-73-177v-370q0-75 52.5-127.5T400-880q75 0 127.5 52.5T580-700v350q0 46-32 78t-78 32q-46 0-78-32t-32-78v-330q0-17 11.5-28.5T400-720q17 0 28.5 11.5T440-680v330q0 13 8.5 21.5T470-320q13 0 21.5-8.5T500-350v-350q-1-42-29.5-71T400-800q-42 0-71 29t-29 71v370q-1 71 49 120.5T470-160q70 0 119-49.5T640-330v-350q0-17 11.5-28.5T680-720q17 0 28.5 11.5T720-680v350Z",
   content_copy: "M360-240q-33 0-56.5-23.5T280-320v-480q0-33 23.5-56.5T360-880h360q33 0 56.5 23.5T800-800v480q0 33-23.5 56.5T720-240H360Zm0-80h360v-480H360v480ZM200-80q-33 0-56.5-23.5T120-160v-520q0-17 11.5-28.5T160-720q17 0 28.5 11.5T200-680v520h400q17 0 28.5 11.5T640-120q0 17-11.5 28.5T600-80H200Zm160-240v-480 480Z",
   check: "M382-240 154-468l57-57 171 171 367-367 57 57-424 424Z",
+  settings: "M370-80q-16 0-27.5-11T328-118l-14-92q-16-5-31.5-13.5T254-244l-88 36q-15 6-29.5 1T115-222L49-337q-8-14-4.5-29.5T58-391l74-57q-2-8-2.5-16.5T129-481q0-8 .5-16.5T132-514L58-571q-13-10-16.5-25.5T45-625l66-115q8-14 22.5-19t29.5 1l88 36q14-9 29.5-17.5T312-732l14-92q3-16 14.5-26t27.5-10h132q16 0 27.5 10t14.5 26l14 92q16 5 31.5 13.5T606-702l88-36q15-6 29.5-1t22.5 19l66 115q8 14 4.5 29.5T813-551l-74 57q2 8 2.5 16.5t.5 16.5q0 8-.5 16.5T739-428l74 57q13 10 16.5 25.5T826-315l-66 115q-8 14-22.5 19T708-182l-88-36q-14 9-29.5 17.5T559-188l-14 92q-3 16-14.5 26T503-60H371Zm66-300q54 0 92-38t38-92q0-54-38-92t-92-38q-54 0-92 38t-38 92q0 54 38 92t92 38Z",
   thumb_up: "M840-640q32 0 56 24t24 56v80q0 7-2 15t-4 15L794-168q-9 20-30 34t-44 14H280v-520l240-238q15-15 35.5-17.5T595-888q19 10 28 28t4 37l-45 183h258Zm-480 34v406h360l120-280v-80H480l54-220-174 174ZM160-120q-33 0-56.5-23.5T80-200v-360q0-33 23.5-56.5T160-640h120v80H160v360h120v80H160Zm200-80v-406 406Z",
   thumb_down: "M120-320q-32 0-56-24t-24-56v-80q0-7 2-15t4-15l120-282q9-20 30-34t44-14h440v520L440-82q-15 15-35.5 17.5T365-72q-19-10-28-28t-4-37l45-183H120Zm480-34v-406H240L120-480v80h360l-54 220 174-174Zm200-486q33 0 56.5 23.5T880-760v360q0 33-23.5 56.5T800-320H680v-80h120v-360H680v-80h120Zm-200 80v406-406Z",
   thumb_up_filled: "M840-640q32 0 56 24t24 56v80q0 7-1.5 15t-4.5 15L794-168q-9 20-30 34t-44 14H400q-33 0-56.5-23.5T320-200v-407q0-16 6.5-30.5T344-663l217-216q15-14 35.5-17t39.5 7q19 10 27.5 28t3.5 37l-45 184h218ZM160-120q-33 0-56.5-23.5T80-200v-360q0-33 23.5-56.5T160-640q33 0 56.5 23.5T240-560v360q0 33-23.5 56.5T160-120Z",
   thumb_down_filled: "M120-320q-32 0-56-24t-24-56v-80q0-7 1.5-15t4.5-15l120-282q9-20 30-34t44-14h320q33 0 56.5 23.5T640-760v407q0 16-6.5 30.5T616-297L399-81q-15 14-35.5 17T324-71q-19-10-27.5-28t-3.5-37l45-184H120Zm680-520q33 0 56.5 23.5T880-760v360q0 33-23.5 56.5T800-320q-33 0-56.5-23.5T720-400v-360q0-33 23.5-56.5T800-840Z",
+  arrow_back: "M360-240 120-480l240-240 56 56-144 144h568q17 0 28.5 11.5T880-480q0 17-11.5 28.5T840-440H272l144 144-56 56Z",
 };
 
 function Icon({ name, size = ICON_SIZE, style = {} }: { name: string; size?: number; style?: React.CSSProperties }) {
@@ -214,6 +216,32 @@ export default function ChatbotPage() {
   const [editValue, setEditValue] = useState("");
   const [copiedMsgId, setCopiedMsgId] = useState<number | null>(null);
   const [examplesOpen, setExamplesOpen] = useState(false);
+  // ── RIGHT PANEL FEATURE ── remove this block + header button + panel JSX to remove feature
+  const [rightPanelOpen, setRightPanelOpen] = useState(false);
+  const [rpMenuOpen, setRpMenuOpen] = useState(false);
+  const [rpMessages, setRpMessages] = useState<Message[]>([]);
+  const [rpInput, setRpInput] = useState("");
+  const [rpThinking, setRpThinking] = useState(false);
+  const rpTextareaRef = useRef<HTMLTextAreaElement>(null);
+  // Panel-local settings — independent from main app
+  const [rpDark, setRpDark] = useState(false);
+  const [rpUseInter, setRpUseInter] = useState(true);
+  const [rpLang, setRpLang] = useState<"en" | "es">("en");
+  const [rpSettingsOpen, setRpSettingsOpen] = useState(false);
+  const [rpSearchOpen, setRpSearchOpen] = useState(false);
+  const [rpSearchQuery, setRpSearchQuery] = useState("");
+  function rpSend() {
+    if (!rpInput.trim() || rpThinking) return;
+    const userMsg: Message = { id: Date.now(), role: "user", content: rpInput.trim() };
+    setRpMessages(prev => [...prev, userMsg]);
+    setRpInput("");
+    setRpThinking(true);
+    setTimeout(() => {
+      setRpMessages(prev => [...prev, { id: Date.now(), role: "assistant", content: "This is a placeholder response from Scoop." }]);
+      setRpThinking(false);
+    }, 2000);
+  }
+  // ── END RIGHT PANEL STATE ──
   const homeTextareaRef = useRef<HTMLTextAreaElement>(null);
   const chatTextareaRef = useRef<HTMLTextAreaElement>(null);
 
@@ -281,6 +309,20 @@ export default function ChatbotPage() {
   const textMuted   = dark ? "#9b9b9b" : "#686866";
   const inputBg     = dark ? "#2a2a2a" : "#fafaf9";
   const hoverBg     = dark ? "#2e2e2e" : "#f0f0ef";
+  // ── RIGHT PANEL independent color tokens ──
+  const rpBg           = rpDark ? "#1a1a1a" : "#f5f5f3";
+  const rpBorder       = rpDark ? "#333"    : "#e5e5e3";
+  const rpTextPrimary  = rpDark ? "#f0f0ef" : "#1a1a1a";
+  const rpTextMuted    = rpDark ? "#9b9b9b" : "#686866";
+  const rpInputBg      = rpDark ? "#2a2a2a" : "#fafaf9";
+  const rpHoverBg      = rpDark ? "#2e2e2e" : "#f0f0ef";
+  const rpFontFamily   = rpUseInter ? "var(--font-inter), sans-serif" : "var(--font-instrument), sans-serif";
+  const rpLs = {
+    heading:  rpUseInter ? "-0.02em"  : "-0.03em",
+    label:    rpUseInter ? "-0.01em"  : "0.02em",
+    body:     rpUseInter ? "-0.011em" : "normal",
+    wordmark: rpUseInter ? "0"        : "-0.01em",
+  };
 
   // ── Radius scale — change BASE to restyle all elements at once ──
   const BASE = 8;
@@ -750,6 +792,23 @@ export default function ChatbotPage() {
 
         <div style={{ flex: 1 }} />
 
+        {/* ── RIGHT PANEL FEATURE — header button — remove to remove feature ── */}
+        {!isMobile && (
+          <Tooltip label={rightPanelOpen ? "Close panel" : "Ask Scoop"} position="bottom">
+            <button
+              aria-label={rightPanelOpen ? "Close Ask Scoop panel" : "Open Ask Scoop panel"}
+              aria-expanded={rightPanelOpen}
+              onClick={() => setRightPanelOpen(o => !o)}
+              style={{ display: "flex", alignItems: "center", gap: 6, background: rightPanelOpen ? (dark ? "#444" : "#c8c8c6") : (dark ? "#333" : "#dddddb"), border: "none", cursor: "pointer", padding: "6px 14px", borderRadius: r.pill, color: dark ? "#fff" : "#1a1a1a", fontSize: 14, fontWeight: 500, minHeight: 32 }}
+              onMouseEnter={e => (e.currentTarget.style.background = dark ? "#444" : "#c8c8c6")}
+              onMouseLeave={e => (e.currentTarget.style.background = rightPanelOpen ? (dark ? "#444" : "#c8c8c6") : (dark ? "#333" : "#dddddb"))}
+            >
+              Ask Scoop
+            </button>
+          </Tooltip>
+        )}
+        {/* ── END RIGHT PANEL HEADER BUTTON ── */}
+
         {view === "chat" && (
           <Tooltip label="New chat" position="bottom">
             <button
@@ -1008,6 +1067,231 @@ export default function ChatbotPage() {
         </div>
       </div>
       </div>}
+
+      {/* ── RIGHT PANEL FEATURE — panel UI — remove this block to remove feature ── */}
+      {!isMobile && <aside
+        aria-label="Ask Scoop panel"
+        style={{ position: "fixed", top: 0, right: 0, bottom: 0, width: isMobile ? "100%" : 360, background: rpBg, borderLeft: isMobile ? "none" : `1px solid ${rpBorder}`, zIndex: 29, display: "flex", flexDirection: "column", transform: rightPanelOpen ? "translateX(0)" : "translateX(100%)", transition: "transform 0.25s ease", boxShadow: rightPanelOpen ? "-4px 0 24px rgba(0,0,0,0.08)" : "none", fontFamily: rpFontFamily }}
+      >
+        {/* Panel header */}
+        <div style={{ height: 52, display: "flex", alignItems: "center", paddingInline: "4px 4px", gap: 4, flexShrink: 0 }}>
+          <Tooltip label="Menu" position="bottom">
+            <button aria-label="Open menu" onClick={() => setRpMenuOpen(o => !o)} style={{ width: isMobile ? 48 : 40, height: isMobile ? 48 : 40, borderRadius: r.md, border: "none", background: "none", cursor: "pointer", display: "flex", alignItems: "center", justifyContent: "center", color: rpTextMuted }} onMouseEnter={e => e.currentTarget.style.background = rpHoverBg} onMouseLeave={e => e.currentTarget.style.background = "none"}>
+              <Icon name="menu" />
+            </button>
+          </Tooltip>
+          <span style={{ fontSize: 15, fontWeight: 600, color: rpTextPrimary, flex: 1, letterSpacing: rpLs.wordmark }}>Scoop</span>
+          <Tooltip label="Close" position="bottom">
+            <button aria-label="Close panel" onClick={() => setRightPanelOpen(false)} style={{ width: isMobile ? 48 : 40, height: isMobile ? 48 : 40, borderRadius: r.md, border: "none", background: "none", cursor: "pointer", display: "flex", alignItems: "center", justifyContent: "center", color: rpTextMuted }} onMouseEnter={e => e.currentTarget.style.background = rpHoverBg} onMouseLeave={e => e.currentTarget.style.background = "none"}>
+              <Icon name="close" />
+            </button>
+          </Tooltip>
+        </div>
+
+        {/* Dev note */}
+        <div style={{ margin: "0 12px 4px", padding: "8px 10px", borderRadius: r.md, background: rpDark ? "#2a2a2a" : "#ececea", flexShrink: 0 }}>
+          <p style={{ fontSize: 12, color: rpTextMuted, lineHeight: 1.5, margin: 0 }}>
+            This panel shows how Scoop could be embedded inside existing apps — e.g. alongside a work order — without leaving the current context.
+          </p>
+        </div>
+
+        {/* Panel inner menu */}
+        {rpMenuOpen && (
+          <div style={{ position: "absolute", top: 0, left: 0, right: 0, bottom: 0, background: rpBg, zIndex: 10, display: "flex", flexDirection: "column", overflowY: "auto" }}>
+            <div style={{ height: 52, display: "flex", alignItems: "center", paddingInline: "4px", flexShrink: 0 }}>
+              <button aria-label="Back" onClick={() => setRpMenuOpen(false)} style={{ width: isMobile ? 48 : 34, height: isMobile ? 48 : 34, borderRadius: r.md, background: rpDark ? "#333" : "#e5e5e3", border: "none", cursor: "pointer", display: "flex", alignItems: "center", justifyContent: "center", color: rpTextMuted }}>
+                <Icon name="arrow_upward" size={18} style={{ transform: "rotate(-90deg)" }} />
+              </button>
+            </div>
+            <div style={{ padding: "0 8px", display: "flex", flexDirection: "column", flex: 1 }}>
+              {/* New chat */}
+              <button onClick={() => { setRpMessages([]); setRpMenuOpen(false); }} style={{ width: "100%", display: "flex", alignItems: "center", gap: 10, padding: "8px 12px", minHeight: 48, borderRadius: r.md, border: "none", background: "none", cursor: "pointer", color: rpTextPrimary, fontSize: 14, textAlign: "left" }} onMouseEnter={e => e.currentTarget.style.background = rpHoverBg} onMouseLeave={e => e.currentTarget.style.background = "none"}>
+                <span style={{ display: "flex", alignItems: "center", justifyContent: "center", width: 26, height: 26, borderRadius: "50%", background: rpDark ? "#3a3a3a" : "#FDDBC8", color: rpTextPrimary, flexShrink: 0 }}><Icon name="add" size={16} /></span>
+                New chat
+              </button>
+              {/* Search chats */}
+              <button onClick={() => { setRpSearchOpen(true); setRpSearchQuery(""); setRpMenuOpen(false); }} style={{ width: "100%", display: "flex", alignItems: "center", gap: 10, padding: "8px 12px", minHeight: 40, borderRadius: r.md, border: "none", background: rpSearchOpen ? rpHoverBg : "none", cursor: "pointer", color: rpTextPrimary, fontSize: 14, textAlign: "left" }} onMouseEnter={e => e.currentTarget.style.background = rpHoverBg} onMouseLeave={e => e.currentTarget.style.background = rpSearchOpen ? rpHoverBg : "none"}>
+                <span style={{ display: "flex", alignItems: "center", justifyContent: "center", width: 26, height: 26, flexShrink: 0 }}><Icon name="search" size={18} /></span>
+                Search chats
+              </button>
+              {/* Settings — collapsible, panel-local */}
+              <div style={{ marginBottom: 4 }}>
+                <button onClick={() => setRpSettingsOpen(o => !o)} aria-expanded={rpSettingsOpen} style={{ width: "100%", display: "flex", alignItems: "center", gap: 6, paddingInline: 12, minHeight: 48, borderRadius: r.md, border: "none", background: "none", cursor: "pointer", fontSize: 13, fontWeight: 500, letterSpacing: rpLs.label, color: rpTextMuted, textAlign: "left" }} onMouseEnter={e => e.currentTarget.style.background = rpHoverBg} onMouseLeave={e => e.currentTarget.style.background = "none"}>
+                  <span style={{ flex: 1 }}>Settings</span>
+                  <Icon name="expand_more" size={18} style={{ transform: rpSettingsOpen ? "rotate(0deg)" : "rotate(-90deg)", transition: "transform 0.15s" }} />
+                </button>
+                {rpSettingsOpen && (
+                  <div style={{ paddingBottom: 4 }}>
+                    <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", padding: "5px 12px" }}>
+                      <span style={{ fontSize: 14, color: rpTextPrimary }}>Appearance</span>
+                      <div role="radiogroup" aria-label="Appearance" style={{ display: "flex", background: rpDark ? "#333" : "#e8e8e6", borderRadius: r.pill, padding: 2, gap: 2 }}>
+                        {(["Light", "Dark"] as const).map(opt => (
+                          <button key={opt} role="radio" aria-checked={(opt === "Dark") === rpDark} onClick={() => setRpDark(opt === "Dark")}
+                            style={{ fontSize: 13, fontWeight: 500, padding: "4px 10px", borderRadius: r.seg, border: "none", cursor: "pointer", background: (opt === "Dark") === rpDark ? (rpDark ? "#555" : "#fff") : "transparent", color: (opt === "Dark") === rpDark ? rpTextPrimary : rpTextMuted, boxShadow: (opt === "Dark") === rpDark ? "0 1px 3px rgba(0,0,0,0.1)" : "none", transition: "all 0.15s" }}
+                          >{opt}</button>
+                        ))}
+                      </div>
+                    </div>
+                    <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", padding: "5px 12px" }}>
+                      <span style={{ fontSize: 14, color: rpTextPrimary }}>Language</span>
+                      <div role="radiogroup" aria-label="Language" style={{ display: "flex", background: rpDark ? "#333" : "#e8e8e6", borderRadius: r.pill, padding: 2, gap: 2 }}>
+                        {(["EN", "ES"] as const).map(opt => (
+                          <button key={opt} role="radio" aria-checked={rpLang === opt.toLowerCase()} onClick={() => setRpLang(opt.toLowerCase() as "en" | "es")}
+                            style={{ fontSize: 13, fontWeight: 500, padding: "4px 10px", borderRadius: r.seg, border: "none", cursor: "pointer", background: rpLang === opt.toLowerCase() ? (rpDark ? "#555" : "#fff") : "transparent", color: rpLang === opt.toLowerCase() ? rpTextPrimary : rpTextMuted, boxShadow: rpLang === opt.toLowerCase() ? "0 1px 3px rgba(0,0,0,0.1)" : "none", transition: "all 0.15s" }}
+                          >{opt}</button>
+                        ))}
+                      </div>
+                    </div>
+                    <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", padding: "5px 12px" }}>
+                      <span style={{ fontSize: 14, color: rpTextPrimary }}>Font</span>
+                      <div role="radiogroup" aria-label="Font" style={{ display: "flex", background: rpDark ? "#333" : "#e8e8e6", borderRadius: r.pill, padding: 2, gap: 2 }}>
+                        {(["Instrument", "Inter"] as const).map(opt => {
+                          const active = opt === "Inter" ? rpUseInter : !rpUseInter;
+                          return (
+                            <button key={opt} role="radio" aria-checked={active} onClick={() => setRpUseInter(opt === "Inter")}
+                              style={{ fontSize: 13, fontWeight: 500, padding: "4px 10px", borderRadius: r.seg, border: "none", cursor: "pointer", background: active ? (rpDark ? "#555" : "#fff") : "transparent", color: active ? rpTextPrimary : rpTextMuted, boxShadow: active ? "0 1px 3px rgba(0,0,0,0.1)" : "none", transition: "all 0.15s" }}
+                            >{opt}</button>
+                          );
+                        })}
+                      </div>
+                    </div>
+                  </div>
+                )}
+              </div>
+              {/* Recents — loads into panel only */}
+              <span style={{ fontSize: 13, fontWeight: 500, letterSpacing: rpLs.label, color: rpTextMuted, padding: "16px 12px 6px" }}>Recents</span>
+              {PAST_CHATS.filter(c => c.id !== "docs").map(chat => (
+                <button key={chat.id} onClick={() => { setRpMessages(chat.id === "docs" ? DOCS_MESSAGES : SAMPLE_MESSAGES); setRpMenuOpen(false); }} style={{ width: "100%", display: "flex", alignItems: "center", gap: 8, padding: "8px 12px", minHeight: 48, borderRadius: r.md, border: "none", background: "none", cursor: "pointer", textAlign: "left" }} onMouseEnter={e => e.currentTarget.style.background = rpHoverBg} onMouseLeave={e => e.currentTarget.style.background = "none"}>
+                  <span style={{ fontSize: 14, color: rpTextPrimary, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap", flex: 1 }}>{chat.title}</span>
+                  <span style={{ fontSize: 12, color: rpTextMuted, flexShrink: 0 }}>{chat.date}</span>
+                </button>
+              ))}
+            </div>
+          </div>
+        )}
+
+        {/* Messages */}
+        <div style={{ flex: 1, overflowY: "auto", display: "flex", flexDirection: "column", gap: 20, padding: "16px 16px 8px" }}>
+          {rpMessages.map(msg => msg.role === "user" ? (
+            <div key={msg.id} style={{ display: "flex", justifyContent: "flex-end" }}>
+              <div style={{ background: rpDark ? "#2e2e2e" : "#ececea", borderRadius: "18px 18px 4px 18px", padding: "9px 14px", fontSize: 15, fontWeight: 500, letterSpacing: rpLs.body, lineHeight: 1.55, color: rpTextPrimary, maxWidth: "85%" }}>{msg.content}</div>
+            </div>
+          ) : (
+            <div key={msg.id} style={{ fontSize: 15, fontWeight: 500, letterSpacing: rpLs.body, lineHeight: 1.7, color: msg.muted ? rpTextMuted : rpTextPrimary }}>{formatContent(msg.content)}</div>
+          ))}
+          {rpThinking && <p style={{ fontSize: 14, color: rpTextMuted, animation: "pulse 1.6s ease-in-out infinite" }}>Scoop is thinking…</p>}
+        </div>
+
+        {/* Empty state — shown above input when no messages */}
+        {rpMessages.length === 0 && (
+          <div style={{ padding: "0 16px 12px", flexShrink: 0 }}>
+            <h2 style={{ fontSize: 18, fontWeight: 600, color: rpTextPrimary, letterSpacing: rpLs.heading, lineHeight: 1.3, marginBottom: 6 }}>Ask about any part, fault, or service.</h2>
+            <p style={{ fontSize: 14, color: rpTextMuted, lineHeight: 1.5, marginBottom: 12 }}>Scoop pulls from your manuals, work orders, and fleet data.</p>
+            <div style={{ display: "flex", flexDirection: "column", gap: 6 }}>
+              {[
+                { title: "Find a part", reply: "Sure — what part, and which asset or model is it for?" },
+                { title: "Diagnose an issue", reply: "Got a fault code? Paste it. Otherwise tell me what it's doing and which asset (e.g. won't start, 451123)." },
+                { title: "Find a service kit", reply: "Which asset, and what interval — 50, 250, 500 hour?" },
+                { title: "Find a manual", reply: "Which machine or asset do you need the manual for?" },
+              ].map(s => (
+                <button
+                  key={s.title}
+                  onClick={() => { const userMsg: Message = { id: Date.now(), role: "user", content: s.title }; setRpMessages([userMsg, { id: Date.now() + 1, role: "assistant", content: s.reply }]); }}
+                  style={{ alignSelf: "flex-start", textAlign: "left", padding: "7px 14px", minHeight: isMobile ? 48 : "auto", borderRadius: r.lg, border: `1.5px solid ${rpBorder}`, background: rpDark ? "#2a2a2a" : "#f7f6f4", cursor: "pointer", fontFamily: "inherit", color: rpTextPrimary, boxShadow: rpDark ? "none" : "0 1px 4px rgba(0,0,0,0.07)" }}
+                  onMouseEnter={e => (e.currentTarget.style.borderColor = rpDark ? "#555" : "#ccc")}
+                  onMouseLeave={e => (e.currentTarget.style.borderColor = rpBorder)}
+                >
+                  <p style={{ whiteSpace: "nowrap", fontSize: 14, color: rpTextPrimary }}>{s.title}</p>
+                </button>
+              ))}
+            </div>
+          </div>
+        )}
+
+        {/* Input */}
+        <div style={{ padding: "8px 12px 16px", flexShrink: 0 }}>
+          <div style={{ width: "100%", background: rpInputBg, border: `1.5px solid ${rpBorder}`, borderRadius: r.xl, boxShadow: rpDark ? "none" : "0 2px 12px rgba(0,0,0,0.06)" }}>
+            <textarea
+              ref={rpTextareaRef}
+              value={rpInput}
+              onChange={e => { setRpInput(e.target.value); if (rpTextareaRef.current) { rpTextareaRef.current.style.height = "auto"; rpTextareaRef.current.style.height = rpTextareaRef.current.scrollHeight + "px"; } }}
+              onKeyDown={e => { if (e.key === "Enter" && !e.shiftKey) { e.preventDefault(); rpSend(); } }}
+              placeholder="Ask Scoop anything"
+              rows={1}
+              style={{ width: "100%", background: "transparent", border: "none", outline: "none", resize: "none", fontSize: 16, fontWeight: 500, lineHeight: 1.55, color: rpTextPrimary, fontFamily: "inherit", padding: "16px 18px 10px", maxHeight: 200, overflowY: "auto" }}
+            />
+            <div style={{ display: "flex", alignItems: "center", padding: "6px 8px 14px" }}>
+              <button style={{ height: isMobile ? 48 : 34, padding: "0 8px", borderRadius: r.md, border: "none", background: "none", cursor: "pointer", display: "flex", alignItems: "center", gap: 4, color: rpTextPrimary, fontSize: 14, whiteSpace: "nowrap" }} onMouseEnter={e => e.currentTarget.style.background = rpHoverBg} onMouseLeave={e => e.currentTarget.style.background = "none"}><Icon name="add" size={20} />Add file or photo</button>
+              <div style={{ flex: 1 }} />
+              <Tooltip label="Use microphone" position="top">
+                <button aria-label="Use microphone" style={{ width: isMobile ? 48 : 34, height: isMobile ? 48 : 34, borderRadius: r.md, border: "none", background: "none", cursor: "pointer", display: "flex", alignItems: "center", justifyContent: "center", color: rpTextMuted }} onMouseEnter={e => e.currentTarget.style.background = rpHoverBg} onMouseLeave={e => e.currentTarget.style.background = "none"}>
+                  <Icon name="mic" size={24} />
+                </button>
+              </Tooltip>
+              <Tooltip label="Send" position="top">
+                <button
+                  aria-label="Send"
+                  onClick={rpSend}
+                  style={{ width: isMobile ? 48 : 34, height: isMobile ? 48 : 34, borderRadius: r.md, background: rpInput.trim() ? "rgb(241,102,34)" : rpDark ? "#333" : "#e5e5e3", border: "none", cursor: rpInput.trim() ? "pointer" : "default", display: "flex", alignItems: "center", justifyContent: "center", color: rpInput.trim() ? "#fff" : rpTextMuted, transition: "background 0.15s", marginLeft: 8 }}
+                >
+                  <Icon name="arrow_upward" size={18} />
+                </button>
+              </Tooltip>
+            </div>
+          </div>
+        </div>
+      </aside>}
+
+      {/* ── RIGHT PANEL search modal ── */}
+      {rpSearchOpen && !isMobile && (
+        <div
+          onClick={() => { setRpSearchOpen(false); setRpSearchQuery(""); }}
+          style={{ position: "fixed", top: 64, right: 368, zIndex: 50 }}
+        >
+          <div
+            role="dialog"
+            aria-modal="true"
+            aria-label="Search panel chats"
+            onClick={e => e.stopPropagation()}
+            onKeyDown={e => { if (e.key === "Escape") { setRpSearchOpen(false); setRpSearchQuery(""); } }}
+            style={{ background: rpBg, borderRadius: r.lg, boxShadow: "0 8px 32px rgba(0,0,0,0.18)", width: 320, overflow: "hidden", fontFamily: rpFontFamily }}
+          >
+            <div style={{ display: "flex", alignItems: "center", gap: 10, padding: "12px 14px", borderBottom: `1px solid ${rpBorder}` }}>
+              <Icon name="search" style={{ color: rpTextMuted, flexShrink: 0 }} />
+              <input
+                autoFocus
+                value={rpSearchQuery}
+                onChange={e => setRpSearchQuery(e.target.value)}
+                placeholder="Search chats…"
+                style={{ flex: 1, background: "transparent", border: "none", outline: "none", fontSize: 16, color: rpTextPrimary, fontFamily: "inherit" }}
+              />
+              {rpSearchQuery && (
+                <button onClick={() => setRpSearchQuery("")} style={{ background: "none", border: "none", cursor: "pointer", color: rpTextMuted, display: "flex", alignItems: "center", justifyContent: "center" }}>
+                  <Icon name="close" size={18} />
+                </button>
+              )}
+            </div>
+            <div style={{ maxHeight: 300, overflowY: "auto", padding: "6px 8px" }}>
+              {PAST_CHATS.filter(c => c.title.toLowerCase().includes(rpSearchQuery.toLowerCase())).map(chat => (
+                <button
+                  key={chat.id}
+                  onClick={() => { setRpMessages(chat.id === "docs" ? DOCS_MESSAGES : SAMPLE_MESSAGES); setRpSearchOpen(false); setRpSearchQuery(""); }}
+                  style={{ width: "100%", display: "flex", alignItems: "center", justifyContent: "space-between", padding: "9px 10px", borderRadius: r.md, border: "none", background: "none", cursor: "pointer", textAlign: "left" }}
+                  onMouseEnter={e => (e.currentTarget.style.background = rpHoverBg)}
+                  onMouseLeave={e => (e.currentTarget.style.background = "none")}
+                >
+                  <span style={{ fontSize: 14, color: rpTextPrimary, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>{chat.title}</span>
+                  <span style={{ fontSize: 12, color: rpTextMuted, flexShrink: 0, marginLeft: 12 }}>{chat.date}</span>
+                </button>
+              ))}
+              {PAST_CHATS.filter(c => c.title.toLowerCase().includes(rpSearchQuery.toLowerCase())).length === 0 && (
+                <p style={{ fontSize: 14, color: rpTextMuted, padding: "10px 12px" }}>No chats found</p>
+              )}
+            </div>
+          </div>
+        </div>
+      )}
+      {/* ── END RIGHT PANEL FEATURE ── */}
 
       <style dangerouslySetInnerHTML={{ __html: `
         @media (pointer: fine) {
