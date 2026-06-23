@@ -749,6 +749,22 @@ export default function ChatbotPage() {
         )}
 
         <div style={{ flex: 1 }} />
+
+        {view === "chat" && (
+          <Tooltip label="New chat" position="bottom">
+            <button
+              aria-label="New chat"
+              onClick={() => { setView("home"); setInput(""); setMessages([]); }}
+              style={{ display: "flex", alignItems: "center", justifyContent: "center", width: isMobile ? 48 : 36, height: isMobile ? 48 : 36, borderRadius: r.md, background: "none", border: "none", cursor: "pointer" }}
+              onMouseEnter={e => (e.currentTarget.style.background = hoverBg)}
+              onMouseLeave={e => (e.currentTarget.style.background = "none")}
+            >
+              <span style={{ display: "flex", alignItems: "center", justifyContent: "center", width: 26, height: 26, borderRadius: "50%", background: dark ? "#3a3a3a" : "#FDDBC8", color: textPrimary, flexShrink: 0 }}>
+                <Icon name="add" size={16} />
+              </span>
+            </button>
+          </Tooltip>
+        )}
       </header>
 
       {/* ── Home screen ──────────────────────────────────────────── */}
