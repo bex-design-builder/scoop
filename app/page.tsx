@@ -15,6 +15,7 @@ type Message = {
   muted?: boolean;
   sources?: Source[];
   handoff?: boolean;
+  interrupted?: boolean;
 };
 
 const EXAMPLE_PROMPTS = [
@@ -57,6 +58,13 @@ const SAMPLE_MESSAGES: Message[] = [
     content:
       "Good instinct — checking the circuit before swapping parts is the right call, especially given the repeat history on this asset.\n\nI can tell you the sensor sits on the left side of the engine block near the water pump outlet, and the signal wire runs through the engine harness to the ECM at connector J2. But I don't have electrical schematics indexed — only service procedure manuals — so I can't give you a confident pin-out or full harness trace.\n\nFor the actual diagram, you'd need Cat ET or SIS Web: search **C7.1 ACERT, Engine Coolant Temperature Sensor Circuit** under the wiring section.",
     handoff: true,
+  },
+  { id: 7, role: "user", content: "Ok let's go ahead — can you draft the work order?" },
+  {
+    id: 8,
+    role: "assistant",
+    content: "On it. Here's a draft work order for the thermostat replacement on ECX-4471:\n\n**Work order — ECX-4471 · Thermostat replacement**\nAsset: 2019 Cat 320 Excavator · Serial #CAT0320GKEC04471\nFault: P0128 — Coolant temperature below thermostat regulating temperature\nBranch: Wichita\n\n**Parts required**\n- 1× Cat thermostat 83°C (Part #1W-2451) — in stock, Wichita branch\n- 1× O-ring seal (included with part)\n\n**Labour estimate**\nApprox. 1.5 hours including coolant drain, thermostat swap,",
+    interrupted: true,
   },
 ];
 
@@ -232,6 +240,7 @@ export default function ChatbotPage() {
   const [chatsSearchOpen, setChatsSearchOpen] = useState(false);
   const [chatsQuery, setChatsQuery] = useState("");
   const [thinking, setThinking] = useState(false);
+  const [retriedIds, setRetriedIds] = useState<Set<number>>(new Set());
   const [chatTitle, setChatTitle] = useState("P0128 fault — ECX-4471");
   const [renameOpen, setRenameOpen] = useState(false);
   const [deleteOpen, setDeleteOpen] = useState(false);
@@ -822,7 +831,7 @@ export default function ChatbotPage() {
         <Tooltip label="Could open Intercom" position="bottom">
           <button
             aria-label="Talk to a person"
-            style={{ display: "flex", alignItems: "center", background: dark ? "#333" : "#dddddb", border: "none", cursor: "pointer", padding: "5px 12px", borderRadius: r.pill, color: dark ? "#fff" : "#1a1a1a", fontSize: 13, fontWeight: 500, minHeight: 32, transition: "background 0.15s" }}
+            style={{ display: "flex", alignItems: "center", background: dark ? "#333" : "#dddddb", border: "none", cursor: "pointer", padding: "5px 12px", borderRadius: r.pill, color: dark ? "#fff" : "#1a1a1a", fontSize: 14, fontWeight: 500, minHeight: 32, fontFamily: "inherit", transition: "background 0.15s" }}
             onMouseEnter={e => e.currentTarget.style.background = dark ? "#444" : "#c8c8c6"}
             onMouseLeave={e => e.currentTarget.style.background = dark ? "#333" : "#dddddb"}
           >
@@ -966,10 +975,10 @@ export default function ChatbotPage() {
       {view === "chat" && <div style={{ flex: 1, overflow: "hidden", display: "flex", flexDirection: "column" }}>
       <div style={{ flex: 1, overflowY: "auto", display: "flex", flexDirection: "column" }}>
       <div style={{ maxWidth: 760, width: "100%", margin: "0 auto", padding: "0 16px", display: "flex", flexDirection: "column", gap: 8, paddingTop: 28, paddingBottom: 32 }}>
-          {messages.map(msg => (
+          {(() => { const lastAiIdx = messages.reduce((acc, m, i) => m.role === "assistant" ? i : acc, -1); return messages.map((msg, mi) => (
             msg.role === "user" ? (
               // ── User bubble ────────────────────────────────────
-              <div key={msg.id} style={{ display: "flex", flexDirection: "column", alignItems: "flex-end", paddingBottom: 8, gap: isMobile ? 0 : 6 }}
+              <div key={msg.id} style={{ display: "flex", flexDirection: "column", alignItems: "flex-end", paddingTop: mi > 0 && messages[mi - 1].role === "assistant" ? 48 : 0, paddingBottom: 8, gap: isMobile ? 0 : 6 }}
                 onMouseEnter={() => setHoveredMsgId(msg.id)}
                 onMouseLeave={() => setHoveredMsgId(null)}
               >
@@ -1032,7 +1041,7 @@ export default function ChatbotPage() {
               </div>
             ) : (
               // ── Assistant response ──────────────────────────────
-              <div key={msg.id} style={{ paddingTop: 8, fontSize: 16, fontWeight: 500, letterSpacing: ls.body, lineHeight: 1.7, color: msg.muted ? textMuted : textPrimary }}>
+              <div key={msg.id} onMouseEnter={() => setHoveredMsgId(msg.id)} onMouseLeave={() => setHoveredMsgId(null)} style={{ paddingTop: 8, fontSize: 16, fontWeight: 500, letterSpacing: ls.body, lineHeight: 1.7, color: msg.muted ? textMuted : textPrimary, position: "relative" }}>
                 {msg.sources && msg.sources.length > 0 ? (
                   msg.content.split("\n\n").map((para, pi) => {
                     const src = msg.sources![pi];
@@ -1068,7 +1077,7 @@ export default function ChatbotPage() {
                 ) : (
                   formatContent(msg.content)
                 )}
-                {!msg.muted && <div style={{ display: "flex", gap: isMobile ? 8 : 4, marginTop: 10 }}>
+                {!msg.muted && !msg.handoff && !msg.interrupted && <div style={{ display: "flex", gap: isMobile ? 8 : 4, ...(mi === lastAiIdx ? { marginTop: 10 } : { position: "absolute", bottom: 0, left: 0, transform: "translateY(100%)", marginTop: 0, paddingTop: 4, zIndex: 10, background: bg }), opacity: (mi === lastAiIdx || hoveredMsgId === msg.id) ? 1 : 0, pointerEvents: (mi === lastAiIdx || hoveredMsgId === msg.id) ? "auto" : "none", transition: "opacity 0.15s" }}>
                   {(["up", "down"] as const).map(dir => {
                     const active = feedback[msg.id] === dir;
                     return (
@@ -1088,10 +1097,10 @@ export default function ChatbotPage() {
                   })}
                 </div>}
                 {msg.handoff && (
-                  <div style={{ display: "flex", alignItems: "center", gap: 10, marginTop: 10, padding: "10px 14px", borderRadius: r.lg, background: dark ? "#1e1e1e" : "#f5f4f2" }}>
-                    <span style={{ fontSize: 14, color: textMuted, flex: 1 }}>I can't find a reliable answer here — want me to bring in a human?</span>
+                  <div style={{ display: "flex", flexDirection: "column", alignItems: "flex-start", gap: 10, marginTop: 32, paddingBottom: 8 }}>
+                    <span style={{ fontSize: 16, color: textMuted }}>I can't find a reliable answer here — want me to bring in a human?</span>
                     <button
-                      style={{ display: "flex", alignItems: "center", padding: "6px 12px", borderRadius: r.pill, border: `1px solid ${border}`, background: dark ? "#2a2a2a" : "#fff", color: textPrimary, fontSize: 13, fontWeight: 500, cursor: "pointer", whiteSpace: "nowrap", fontFamily: "inherit", flexShrink: 0, transition: "background 0.12s" }}
+                      style={{ display: "flex", alignItems: "center", padding: "6px 12px", borderRadius: r.pill, border: `1px solid ${border}`, background: dark ? "#2a2a2a" : "#fff", color: textPrimary, fontSize: 14, fontWeight: 500, cursor: "pointer", whiteSpace: "nowrap", fontFamily: "inherit", transition: "background 0.12s" }}
                       onMouseEnter={e => e.currentTarget.style.background = hoverBg}
                       onMouseLeave={e => e.currentTarget.style.background = dark ? "#2a2a2a" : "#fff"}
                     >
@@ -1099,13 +1108,33 @@ export default function ChatbotPage() {
                     </button>
                   </div>
                 )}
+                {msg.interrupted && !retriedIds.has(msg.id) && (
+                  <div style={{ display: "flex", flexDirection: "column", alignItems: "flex-start", gap: 10, marginTop: 32, paddingBottom: 8 }}>
+                    <span style={{ fontSize: 16, color: textMuted }}>Response was interrupted.</span>
+                    <button
+                      onClick={() => {
+                        setRetriedIds(prev => new Set(prev).add(msg.id));
+                        setThinking(true);
+                        setTimeout(() => {
+                          setMessages(prev => prev.map(m => m.id === msg.id ? { ...m, content: m.content + " refill, and road test to confirm P0128 is cleared before closing the work order.\n\nReady to submit — want me to assign it to the next available tech at the Wichita branch?", interrupted: false } : m));
+                          setThinking(false);
+                        }, 2000);
+                      }}
+                      style={{ display: "flex", alignItems: "center", gap: 5, padding: "6px 12px", borderRadius: r.pill, border: `1px solid ${border}`, background: dark ? "#2a2a2a" : "#fff", color: textPrimary, fontSize: 14, fontWeight: 500, cursor: "pointer", whiteSpace: "nowrap", fontFamily: "inherit", transition: "background 0.12s" }}
+                      onMouseEnter={e => e.currentTarget.style.background = hoverBg}
+                      onMouseLeave={e => e.currentTarget.style.background = dark ? "#2a2a2a" : "#fff"}
+                    >
+                      Try again
+                    </button>
+                  </div>
+                )}
               </div>
             )
-          ))}
+          )); })()}
 
           {/* Thinking indicator */}
           {thinking && (
-            <div style={{ paddingTop: 12, fontSize: 14, color: textMuted, animation: "pulse 1.6s ease-in-out infinite" }}>
+            <div style={{ paddingTop: 12, fontSize: 16, color: textMuted, animation: "pulse 1.6s ease-in-out infinite" }}>
               Thinking…
             </div>
           )}
