@@ -2,11 +2,19 @@
 
 import React, { useState, useEffect, useRef } from "react";
 
+type Source = {
+  type: "Manual" | "Work order" | "Parts" | "Service history" | "Inventory" | "Slack";
+  label: string;
+  short: string;
+};
+
 type Message = {
   id: number;
   role: "user" | "assistant";
   content: string;
   muted?: boolean;
+  sources?: Source[];
+  handoff?: boolean;
 };
 
 const EXAMPLE_PROMPTS = [
@@ -24,6 +32,11 @@ const SAMPLE_MESSAGES: Message[] = [
     role: "assistant",
     content:
       "P0128 is a **coolant temperature below thermostat regulating temperature** fault. On asset #ECX-4471 (2019 Cat 320 Excavator), this usually points to one of three things:\n\n**Most likely — thermostat stuck open.** The coolant never reaches operating temp, so the ECM throws P0128. Replacement is straightforward and the part is in stock at your Wichita branch (Part #1W-2451).\n\n**Less likely — coolant temp sensor drift.** The sensor can read low without a true thermostat failure. Worth checking resistance values before replacing the thermostat.\n\n**Rare — low coolant level.** Check the reservoir first as a quick win.\n\nThis asset has had two prior P0128 events (March and August last year), both resolved with thermostat replacement. I'd prioritise that.",
+    sources: [
+      { type: "Manual", label: "Cat 320 Service Manual — Section 4: Engine", short: "Cat 320 manual" },
+      { type: "Service history", label: "ECX-4471 — Fault history 2023–2024", short: "ECX-4471" },
+      { type: "Slack", label: "#service-techs — P0128 thread", short: "#service-techs" },
+    ],
   },
   { id: 3, role: "user", content: "Is the thermostat part in stock nearby?" },
   {
@@ -31,8 +44,22 @@ const SAMPLE_MESSAGES: Message[] = [
     role: "assistant",
     content:
       "Yes — Part #1W-2451 (Cat thermostat, 83°C rating) is available at two nearby locations:\n\n- **Wichita branch** — 4 units on hand, ~12 miles from the asset's current location\n- **Oklahoma City branch** — 7 units on hand, ~94 miles\n\nWichita is the obvious pick. I can add it to an open work order or create a new one — want me to draft a work order for this repair and assign it to the next available tech in that area?",
+    sources: [
+      { type: "Inventory", label: "Parts inventory — Wichita branch", short: "Wichita" },
+      { type: "Inventory", label: "Parts inventory — Oklahoma City branch", short: "OKC" },
+      { type: "Parts", label: "Cat 320 — Cooling system parts catalogue", short: "Cat 320 parts" },
+    ],
+  },
+  { id: 5, role: "user", content: "Before I order — can you pull the wiring diagram for the coolant temp sensor circuit? Want to check for corrosion first." },
+  {
+    id: 6,
+    role: "assistant",
+    content:
+      "Good instinct — checking the circuit before swapping parts is the right call, especially given the repeat history on this asset.\n\nI can tell you the sensor sits on the left side of the engine block near the water pump outlet, and the signal wire runs through the engine harness to the ECM at connector J2. But I don't have electrical schematics indexed — only service procedure manuals — so I can't give you a confident pin-out or full harness trace.\n\nFor the actual diagram, you'd need Cat ET or SIS Web: search **C7.1 ACERT, Engine Coolant Temperature Sensor Circuit** under the wiring section.",
+    handoff: true,
   },
 ];
+
 
 const APPS = [
   {
@@ -72,7 +99,7 @@ const DOCS_MESSAGES: Message[] = [
   { id: 101, role: "user", content: "Can you give me a full overview of how this app works?" },
   {
     id: 102, role: "assistant",
-    content: "Here's a full rundown of Scoop — how it's structured, how each feature works, and things to know before making changes.\n\n---\n\n**App structure**\n\nThe app has two screens: a **home screen** and a **chat screen**. The user starts on the home screen and moves into the chat once they send a message or tap a quick-start button.\n\nThe home screen is a calm landing state — a headline, a short description, four quick-start buttons, and an input field. Nothing is open by default.\n\nOnce a conversation is underway, the screen shifts to a three-layer layout:\n- The **header bar** at the top — always fixed. Shows the menu icon and the current conversation title.\n- The **message area** in the middle — the only part that scrolls. New messages appear at the bottom and the view follows them automatically.\n- The **input bar** at the bottom — always fixed. The user can always reach it without scrolling, no matter how long the conversation gets.\n\nIf the user types a long message, the input bar grows upward into the message area — nothing overlaps. It expands up to around 7–8 lines, then becomes scrollable internally. The send and mic buttons stay anchored to the bottom of the input bar as it grows.\n\n---\n\n**Quick-start buttons**\n\nBelow the headline on the home screen are four suggestion buttons — Find a part, Diagnose an issue, Find a service kit, and Find a manual. Tapping one immediately sends a pre-written message on the user's behalf and triggers a contextually relevant response from Scoop — the conversation starts instantly, without a blank screen moment.\n\nThe intent is that the response feels like a natural opening to a real conversation, not a canned FAQ answer. As the product develops, these responses should prompt the user to give more detail (like an asset number or fault code) rather than trying to answer in full without enough information.\n\n---\n\n**Side menu**\n\nThe side menu slides in from the left when the user taps the menu icon in the top-left corner. A semi-transparent overlay covers the rest of the screen — tapping it closes the menu.\n\nNavigation is organised into collapsible sections so it doesn't feel overwhelming:\n- **New chat** — returns to the home screen\n- **Search chats** — opens a focused search overlay that filters conversations in real time as the user types. Tapping a result opens that conversation. Escape or tapping outside closes it.\n- **My tools** — connected integrations (named 'My tools' rather than 'Apps' — language that feels natural to a field technician)\n- **My data** — connected data sources, using plain language rather than 'Data sources'\n- **Dev tools** — visible during development/testing\n- **Settings** — appearance, language, and font preferences\n- **Recent conversations** — list of past chats. The active one is highlighted. Each has a three-dot menu on hover/long-press with options to rename or delete.\n- **Account** (pinned to bottom) — name and email. Tapping reveals a log out option.\n\n---\n\n**Rename a conversation**\n\nFrom the three-dot menu on any recent conversation, the user can rename it. This opens a modal with the current title pre-filled — so they can edit rather than retype. Saving updates the title in both the header and the recents list. Cancel or Escape closes without any change.\n\n---\n\n**Mobile behaviours**\n\nMobile is detected by whether the device uses a touch pointer — not by screen width. A tablet with a keyboard attached is treated as a desktop.\n\n- Every tappable element is at least 48×48px on touch devices, with at least 8px between adjacent targets\n- Input text is 16px — anything smaller triggers iOS Safari auto-zoom on focus\n- The app uses a modern viewport unit that accounts for the browser's address bar and bottom chrome on mobile\n- On mobile, Enter adds a new line. On desktop, Enter sends; Shift+Enter adds a new line.\n\n---\n\n**Accessibility (WCAG 2.1 AA)**\n\n- All text meets minimum 4.5:1 contrast ratio against its background\n- Escape closes the sidebar, menus, and modals\n- Tab is trapped inside open modals so focus can't escape behind the overlay\n- Every interactive element shows a visible orange focus ring when reached by keyboard\n- Every icon-only button has a screen reader label\n- Collapsible sections, menus, and modals use the correct ARIA roles and states\n- The sidebar is hidden from screen readers when closed\n- An announcement region notifies screen readers when Scoop is thinking or a new response arrives\n- All animations are disabled for users who have reduced motion turned on\n\n---\n\n**Things to know before making changes**\n\n- Tooltips are desktop-only — they appear on hover for mouse/trackpad users and are hidden on touch screens entirely\n- User messages in the chat show Copy and Edit buttons. On desktop they appear on hover; on mobile they're always visible. Copy writes the message to the clipboard and confirms with a checkmark icon. Edit opens an inline text field spanning the full conversation width, pre-filled with the message — the user can make changes and tap Send to update it, or Cancel to close without saving. Enter sends on desktop; Escape cancels.\n- The delete confirmation modal is intentional — the action is irreversible and the extra step prevents accidents\n- Below the input on the home screen is a collapsed \"Not sure what to ask?\" disclosure. Tapping it reveals a divider labelled \"Try these examples\" and a list of 5 real-world example queries. Tapping any inserts the text into the input field so the user can edit it before sending. The examples are stored as a simple array at the top of the file — copy can be updated without touching any other code. This section is only visible on the home screen and disappears once a conversation starts.",
+    content: "Here's a full rundown of Scoop — how it's structured, how each feature works, and things to know before making changes.\n\n---\n\n**App structure**\n\nThe app has two screens: a **home screen** and a **chat screen**. The user starts on the home screen and moves into the chat once they send a message or tap a quick-start button.\n\nThe home screen is a calm landing state — a headline, a short description, four quick-start buttons, and an input field. Nothing is open by default.\n\nOnce a conversation is underway, the screen shifts to a three-layer layout:\n- The **header bar** at the top — always fixed. Shows the menu icon and the current conversation title.\n- The **message area** in the middle — the only part that scrolls. New messages appear at the bottom and the view follows them automatically.\n- The **input bar** at the bottom — always fixed. The user can always reach it without scrolling, no matter how long the conversation gets.\n\nIf the user types a long message, the input bar grows upward into the message area — nothing overlaps. It expands up to around 7–8 lines, then becomes scrollable internally. The send and mic buttons stay anchored to the bottom of the input bar as it grows.\n\n---\n\n**Quick-start buttons**\n\nBelow the headline on the home screen are four suggestion buttons — Find a part, Diagnose an issue, Find a service kit, and Find a manual. Tapping one immediately sends a pre-written message on the user's behalf and triggers a contextually relevant response from Scoop — the conversation starts instantly, without a blank screen moment.\n\nThe intent is that the response feels like a natural opening to a real conversation, not a canned FAQ answer. As the product develops, these responses should prompt the user to give more detail (like an asset number or fault code) rather than trying to answer in full without enough information.\n\n---\n\n**Side menu**\n\nThe side menu slides in from the left when the user taps the menu icon in the top-left corner. A semi-transparent overlay covers the rest of the screen — tapping it closes the menu.\n\nNavigation is organised into collapsible sections so it doesn't feel overwhelming:\n- **New chat** — returns to the home screen\n- **Search chats** — opens a focused search overlay that filters conversations in real time as the user types. Tapping a result opens that conversation. Escape or tapping outside closes it.\n- **My tools** — connected integrations (named 'My tools' rather than 'Apps' — language that feels natural to a field technician)\n- **My data** — connected data sources, using plain language rather than 'Data sources'\n- **Dev tools** — visible during development/testing\n- **Settings** — appearance, language, and font preferences\n- **Recent conversations** — list of past chats. The active one is highlighted. Each has a three-dot menu on hover/long-press with options to rename or delete.\n- **Account** (pinned to bottom) — name and email. Tapping reveals a log out option.\n\n---\n\n**Rename a conversation**\n\nFrom the three-dot menu on any recent conversation, the user can rename it. This opens a modal with the current title pre-filled — so they can edit rather than retype. Saving updates the title in both the header and the recents list. Cancel or Escape closes without any change.\n\n---\n\n**Mobile behaviours**\n\nMobile is detected by whether the device uses a touch pointer — not by screen width. A tablet with a keyboard attached is treated as a desktop.\n\n- Every tappable element is at least 48×48px on touch devices, with at least 8px between adjacent targets\n- Input text is 16px — anything smaller triggers iOS Safari auto-zoom on focus\n- The app uses a modern viewport unit that accounts for the browser's address bar and bottom chrome on mobile\n- On mobile, Enter adds a new line. On desktop, Enter sends; Shift+Enter adds a new line.\n\n---\n\n**Accessibility (WCAG 2.1 AA)**\n\n- All text meets minimum 4.5:1 contrast ratio against its background\n- Escape closes the sidebar, menus, and modals\n- Tab is trapped inside open modals so focus can't escape behind the overlay\n- Every interactive element shows a visible orange focus ring when reached by keyboard\n- Every icon-only button has a screen reader label\n- Collapsible sections, menus, and modals use the correct ARIA roles and states\n- The sidebar is hidden from screen readers when closed\n- An announcement region notifies screen readers when Scoop is thinking or a new response arrives\n- All animations are disabled for users who have reduced motion turned on\n\n---\n\n**Feature notes**\n\n*Tooltips*\n- Desktop-only — they appear on hover for mouse/trackpad users and are hidden on touch screens entirely\n\n*Copy and edit on user messages*\n- On desktop, Copy and Edit buttons appear when hovering a user message; on mobile they're always visible\n- Copy writes the message to the clipboard and confirms with a checkmark icon\n- Edit opens an inline text field spanning the full conversation width, pre-filled with the message — the user can make changes and tap Send to update it, or Cancel to close without saving. Enter sends on desktop; Escape cancels\n\n*Delete confirmation*\n- The confirmation step is intentional — the action is irreversible and the extra step prevents accidents\n\n*\"Not sure what to ask?\" disclosure*\n- Collapsed by default below the input on the home screen. Tapping reveals a divider labelled \"Try these examples\" and a list of 5 real-world example queries\n- Tapping any example inserts the text into the input field so the user can edit it before sending\n- The examples are stored as a simple array at the top of the file — copy can be updated without touching any other code\n- Only visible on the home screen; disappears once a conversation starts\n\n---\n\n**Right side panel (prototype)**\n\nThe right panel is a desktop-only prototype showing how Scoop could be embedded alongside an existing app — for example, next to a work order — without requiring the user to leave their current context.\n\nThe panel is intentionally self-contained — it runs as its own independent instance of Scoop:\n- Its own conversation history (separate from the main chat)\n- Its own settings: appearance, language, and font can all be adjusted independently from the main app via the panel's menu\n- Its own recents list: clicking a past conversation loads it into the panel only\n- Its own search: the search popover is anchored to the panel's left edge and results open inside the panel",
   },
 ];
 
@@ -792,6 +819,17 @@ export default function ChatbotPage() {
 
         <div style={{ flex: 1 }} />
 
+        <Tooltip label="Could open Intercom" position="bottom">
+          <button
+            aria-label="Talk to a person"
+            style={{ display: "flex", alignItems: "center", background: dark ? "#333" : "#dddddb", border: "none", cursor: "pointer", padding: "5px 12px", borderRadius: r.pill, color: dark ? "#fff" : "#1a1a1a", fontSize: 13, fontWeight: 500, minHeight: 32, transition: "background 0.15s" }}
+            onMouseEnter={e => e.currentTarget.style.background = dark ? "#444" : "#c8c8c6"}
+            onMouseLeave={e => e.currentTarget.style.background = dark ? "#333" : "#dddddb"}
+          >
+            Talk to a person
+          </button>
+        </Tooltip>
+
         {/* ── RIGHT PANEL FEATURE — header button — remove to remove feature ── */}
         {!isMobile && (
           <Tooltip label={rightPanelOpen ? "Close panel" : "Ask Scoop"} position="bottom">
@@ -995,26 +1033,72 @@ export default function ChatbotPage() {
             ) : (
               // ── Assistant response ──────────────────────────────
               <div key={msg.id} style={{ paddingTop: 8, fontSize: 16, fontWeight: 500, letterSpacing: ls.body, lineHeight: 1.7, color: msg.muted ? textMuted : textPrimary }}>
-                {formatContent(msg.content)}
+                {msg.sources && msg.sources.length > 0 ? (
+                  msg.content.split("\n\n").map((para, pi) => {
+                    const src = msg.sources![pi];
+                    const chip = src ? (
+                      <button
+                        title={src.label}
+                        style={{ display: "inline-flex", alignItems: "center", verticalAlign: "-0.15em", marginLeft: 6, padding: isMobile ? "10px 4px" : "0", background: "none", border: "none", cursor: "pointer", fontFamily: "inherit" }}
+                        onMouseEnter={e => { const s = e.currentTarget.querySelector("span") as HTMLElement | null; if (s) { s.style.background = dark ? "#333" : "#e2e0de"; s.style.color = textPrimary; } }}
+                        onMouseLeave={e => { const s = e.currentTarget.querySelector("span") as HTMLElement | null; if (s) { s.style.background = dark ? "#2a2a2a" : "#eeecea"; s.style.color = textMuted; } }}
+                      >
+                        <span style={{ display: "inline-flex", alignItems: "center", padding: "2px 7px", borderRadius: 999, border: `1px solid ${border}`, background: dark ? "#2a2a2a" : "#eeecea", fontSize: 11, fontWeight: 600, letterSpacing: "0.05em", textTransform: "uppercase", color: textMuted, whiteSpace: "nowrap", transition: "background 0.12s, color 0.12s", pointerEvents: "none" }}>
+                          {src.short}
+                        </span>
+                      </button>
+                    ) : null;
+                    const lines = para.split("\n");
+                    const last = lines[lines.length - 1];
+                    return (
+                      <div key={pi} style={{ marginBottom: pi < msg.content.split("\n\n").length - 1 ? "0.6em" : 0 }}>
+                        {lines.slice(0, -1).map((line, li) => {
+                          if (line.startsWith("- ")) return <li key={li} style={{ marginLeft: 18, display: "list-item", listStyleType: "disc" }}>{renderInline(line.slice(2))}</li>;
+                          if (line === "") return <br key={li} />;
+                          return <p key={li}>{renderInline(line)}</p>;
+                        })}
+                        {last.startsWith("- ") ? (
+                          <li key="l" style={{ marginLeft: 18, display: "list-item", listStyleType: "disc" }}>{renderInline(last.slice(2))}{chip}</li>
+                        ) : last === "" ? chip : (
+                          <p key="l">{renderInline(last)}{chip}</p>
+                        )}
+                      </div>
+                    );
+                  })
+                ) : (
+                  formatContent(msg.content)
+                )}
                 {!msg.muted && <div style={{ display: "flex", gap: isMobile ? 8 : 4, marginTop: 10 }}>
                   {(["up", "down"] as const).map(dir => {
                     const active = feedback[msg.id] === dir;
                     return (
-                      <Tooltip key={dir} label={dir === "up" ? "Good response" : "Bad response"} position="bottom">
-                        <button
-                          onClick={() => setFeedback(prev => ({ ...prev, [msg.id]: prev[msg.id] === dir ? null : dir }))}
-                          aria-pressed={active}
-                          aria-label={dir === "up" ? "Good response" : "Bad response"}
-                          style={{ width: isMobile ? 48 : 30, height: isMobile ? 48 : 30, borderRadius: r.md, border: "none", background: active ? hoverBg : "none", cursor: "pointer", display: "flex", alignItems: "center", justifyContent: "center", color: active ? textPrimary : textMuted, transition: "background 0.15s, color 0.15s" }}
-                          onMouseEnter={e => { if (!active) e.currentTarget.style.background = hoverBg; }}
-                          onMouseLeave={e => { if (!active) e.currentTarget.style.background = "none"; }}
-                        >
-                          <Icon name={active ? (dir === "up" ? "thumb_up_filled" : "thumb_down_filled") : (dir === "up" ? "thumb_up" : "thumb_down")} size={16} />
-                        </button>
-                      </Tooltip>
+                      <button
+                        key={dir}
+                        onClick={() => setFeedback(prev => ({ ...prev, [msg.id]: prev[msg.id] === dir ? null : dir }))}
+                        aria-pressed={active}
+                        aria-label={dir === "up" ? "That solved it" : "Still stuck"}
+                        style={{ display: "flex", alignItems: "center", gap: 5, padding: "4px 10px", height: isMobile ? 48 : 28, borderRadius: r.pill, border: "none", background: active ? hoverBg : "none", cursor: "pointer", color: active ? textPrimary : textMuted, fontSize: 13, fontWeight: 500, fontFamily: "inherit", transition: "background 0.15s, color 0.15s" }}
+                        onMouseEnter={e => { if (!active) { e.currentTarget.style.background = hoverBg; e.currentTarget.style.color = textPrimary; } }}
+                        onMouseLeave={e => { if (!active) { e.currentTarget.style.background = "none"; e.currentTarget.style.color = textMuted; } }}
+                      >
+                        <Icon name={active ? (dir === "up" ? "thumb_up_filled" : "thumb_down_filled") : (dir === "up" ? "thumb_up" : "thumb_down")} size={14} />
+                        {dir === "up" ? "That solved it" : "Still stuck"}
+                      </button>
                     );
                   })}
                 </div>}
+                {msg.handoff && (
+                  <div style={{ display: "flex", alignItems: "center", gap: 10, marginTop: 10, padding: "10px 14px", borderRadius: r.lg, background: dark ? "#1e1e1e" : "#f5f4f2" }}>
+                    <span style={{ fontSize: 14, color: textMuted, flex: 1 }}>I can't find a reliable answer here — want me to bring in a human?</span>
+                    <button
+                      style={{ display: "flex", alignItems: "center", padding: "6px 12px", borderRadius: r.pill, border: `1px solid ${border}`, background: dark ? "#2a2a2a" : "#fff", color: textPrimary, fontSize: 13, fontWeight: 500, cursor: "pointer", whiteSpace: "nowrap", fontFamily: "inherit", flexShrink: 0, transition: "background 0.12s" }}
+                      onMouseEnter={e => e.currentTarget.style.background = hoverBg}
+                      onMouseLeave={e => e.currentTarget.style.background = dark ? "#2a2a2a" : "#fff"}
+                    >
+                      Talk to a person
+                    </button>
+                  </div>
+                )}
               </div>
             )
           ))}
@@ -1110,7 +1194,7 @@ export default function ChatbotPage() {
                 New chat
               </button>
               {/* Search chats */}
-              <button onClick={() => { setRpSearchOpen(true); setRpSearchQuery(""); setRpMenuOpen(false); }} style={{ width: "100%", display: "flex", alignItems: "center", gap: 10, padding: "8px 12px", minHeight: 40, borderRadius: r.md, border: "none", background: rpSearchOpen ? rpHoverBg : "none", cursor: "pointer", color: rpTextPrimary, fontSize: 14, textAlign: "left" }} onMouseEnter={e => e.currentTarget.style.background = rpHoverBg} onMouseLeave={e => e.currentTarget.style.background = rpSearchOpen ? rpHoverBg : "none"}>
+              <button onClick={() => { setRpSearchOpen(true); setRpSearchQuery(""); }} style={{ width: "100%", display: "flex", alignItems: "center", gap: 10, padding: "8px 12px", minHeight: 40, borderRadius: r.md, border: "none", background: rpSearchOpen ? rpHoverBg : "none", cursor: "pointer", color: rpTextPrimary, fontSize: 14, textAlign: "left" }} onMouseEnter={e => e.currentTarget.style.background = rpHoverBg} onMouseLeave={e => e.currentTarget.style.background = rpSearchOpen ? rpHoverBg : "none"}>
                 <span style={{ display: "flex", alignItems: "center", justifyContent: "center", width: 26, height: 26, flexShrink: 0 }}><Icon name="search" size={18} /></span>
                 Search chats
               </button>
@@ -1275,7 +1359,7 @@ export default function ChatbotPage() {
               {PAST_CHATS.filter(c => c.title.toLowerCase().includes(rpSearchQuery.toLowerCase())).map(chat => (
                 <button
                   key={chat.id}
-                  onClick={() => { setRpMessages(chat.id === "docs" ? DOCS_MESSAGES : SAMPLE_MESSAGES); setRpSearchOpen(false); setRpSearchQuery(""); }}
+                  onClick={() => { setRpMessages(chat.id === "docs" ? DOCS_MESSAGES : SAMPLE_MESSAGES); setRpSearchOpen(false); setRpSearchQuery(""); setRpMenuOpen(false); }}
                   style={{ width: "100%", display: "flex", alignItems: "center", justifyContent: "space-between", padding: "9px 10px", borderRadius: r.md, border: "none", background: "none", cursor: "pointer", textAlign: "left" }}
                   onMouseEnter={e => (e.currentTarget.style.background = rpHoverBg)}
                   onMouseLeave={e => (e.currentTarget.style.background = "none")}
