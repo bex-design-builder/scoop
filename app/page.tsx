@@ -16,6 +16,9 @@ type Message = {
   sources?: Source[];
   handoff?: boolean;
   interrupted?: boolean;
+  // "answer" = Scoop is recommending a fix or believes it resolved the issue → show labelled feedback
+  // "followup" = clarifying question or intermediate step → show icon-only feedback
+  kind?: "answer" | "followup";
 };
 
 const EXAMPLE_PROMPTS = [
@@ -33,6 +36,7 @@ const SAMPLE_MESSAGES: Message[] = [
     role: "assistant",
     content:
       "P0128 is a **coolant temperature below thermostat regulating temperature** fault. On asset #ECX-4471 (2019 Cat 320 Excavator), this usually points to one of three things:\n\n**Most likely — thermostat stuck open.** The coolant never reaches operating temp, so the ECM throws P0128. Replacement is straightforward and the part is in stock at your Wichita branch (Part #1W-2451).\n\n**Less likely — coolant temp sensor drift.** The sensor can read low without a true thermostat failure. Worth checking resistance values before replacing the thermostat.\n\n**Rare — low coolant level.** Check the reservoir first as a quick win.\n\nThis asset has had two prior P0128 events (March and August last year), both resolved with thermostat replacement. I'd prioritise that.",
+    kind: "answer",
     sources: [
       { type: "Manual", label: "Cat 320 Service Manual — Section 4: Engine", short: "Cat 320 manual" },
       { type: "Service history", label: "ECX-4471 — Fault history 2023–2024", short: "ECX-4471" },
@@ -45,6 +49,7 @@ const SAMPLE_MESSAGES: Message[] = [
     role: "assistant",
     content:
       "Yes — Part #1W-2451 (Cat thermostat, 83°C rating) is available at two nearby locations:\n\n- **Wichita branch** — 4 units on hand, ~12 miles from the asset's current location\n- **Oklahoma City branch** — 7 units on hand, ~94 miles\n\nWichita is the obvious pick. I can add it to an open work order or create a new one — want me to draft a work order for this repair and assign it to the next available tech in that area?",
+    kind: "followup",
     sources: [
       { type: "Inventory", label: "Parts inventory — Wichita branch", short: "Wichita" },
       { type: "Inventory", label: "Parts inventory — Oklahoma City branch", short: "OKC" },
@@ -1080,18 +1085,19 @@ export default function ChatbotPage() {
                 {!msg.muted && !msg.handoff && !msg.interrupted && <div style={{ display: "flex", gap: isMobile ? 8 : 4, ...(mi === lastAiIdx ? { marginTop: 10 } : { position: "absolute", bottom: 0, left: 0, transform: "translateY(100%)", marginTop: 0, paddingTop: 4, zIndex: 10, background: bg }), opacity: (mi === lastAiIdx || hoveredMsgId === msg.id) ? 1 : 0, pointerEvents: (mi === lastAiIdx || hoveredMsgId === msg.id) ? "auto" : "none", transition: "opacity 0.15s" }}>
                   {(["up", "down"] as const).map(dir => {
                     const active = feedback[msg.id] === dir;
+                    const isAnswer = msg.kind === "answer";
                     return (
                       <button
                         key={dir}
                         onClick={() => setFeedback(prev => ({ ...prev, [msg.id]: prev[msg.id] === dir ? null : dir }))}
                         aria-pressed={active}
                         aria-label={dir === "up" ? "That solved it" : "Still stuck"}
-                        style={{ display: "flex", alignItems: "center", gap: 5, padding: "4px 10px", height: isMobile ? 48 : 28, borderRadius: r.pill, border: "none", background: active ? hoverBg : "none", cursor: "pointer", color: active ? textPrimary : textMuted, fontSize: 13, fontWeight: 500, fontFamily: "inherit", transition: "background 0.15s, color 0.15s" }}
+                        style={{ display: "flex", alignItems: "center", gap: 5, padding: isAnswer ? "4px 10px" : "4px 6px", height: isMobile ? 48 : 28, borderRadius: r.pill, border: "none", background: active ? hoverBg : "none", cursor: "pointer", color: active ? textPrimary : textMuted, fontSize: 13, fontWeight: 500, fontFamily: "inherit", transition: "background 0.15s, color 0.15s" }}
                         onMouseEnter={e => { if (!active) { e.currentTarget.style.background = hoverBg; e.currentTarget.style.color = textPrimary; } }}
                         onMouseLeave={e => { if (!active) { e.currentTarget.style.background = "none"; e.currentTarget.style.color = textMuted; } }}
                       >
                         <Icon name={active ? (dir === "up" ? "thumb_up_filled" : "thumb_down_filled") : (dir === "up" ? "thumb_up" : "thumb_down")} size={14} />
-                        {dir === "up" ? "That solved it" : "Still stuck"}
+                        {isAnswer && (dir === "up" ? "That solved it" : "Still stuck")}
                       </button>
                     );
                   })}
