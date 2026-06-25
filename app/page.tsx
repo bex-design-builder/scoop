@@ -19,6 +19,7 @@ type Message = {
   // "answer" = Scoop is recommending a fix or believes it resolved the issue → show labelled feedback
   // "followup" = clarifying question or intermediate step → show icon-only feedback
   kind?: "answer" | "followup";
+  suggestions?: string[];
 };
 
 const EXAMPLE_PROMPTS = [
@@ -29,7 +30,8 @@ const EXAMPLE_PROMPTS = [
   "Service manual for a Genie GS-4655",
 ];
 
-const SAMPLE_MESSAGES: Message[] = [
+// c1 — Diagnosis with quick-reply suggestions
+const MESSAGES_C1: Message[] = [
   { id: 1, role: "user", content: "What's causing fault code P0128 on asset #ECX-4471?" },
   {
     id: 2,
@@ -42,36 +44,40 @@ const SAMPLE_MESSAGES: Message[] = [
       { type: "Service history", label: "ECX-4471 — Fault history 2023–2024", short: "ECX-4471" },
       { type: "Slack", label: "#service-techs — P0128 thread", short: "#service-techs" },
     ],
+    suggestions: ["Is the part in stock nearby?", "How do I replace it?", "Show full fault history"],
   },
-  { id: 3, role: "user", content: "Is the thermostat part in stock nearby?" },
+];
+
+// c2 — Wiring diagram → handoff to human
+const MESSAGES_C2: Message[] = [
+  { id: 1, role: "user", content: "Can you pull the wiring diagram for the coolant temp sensor circuit on ECX-4471? Want to trace for corrosion before replacing." },
   {
-    id: 4,
+    id: 2,
     role: "assistant",
     content:
-      "Yes — Part #1W-2451 (Cat thermostat, 83°C rating) is available at two nearby locations:\n\n- **Wichita branch** — 4 units on hand, ~12 miles from the asset's current location\n- **Oklahoma City branch** — 7 units on hand, ~94 miles\n\nWichita is the obvious pick. I can add it to an open work order or create a new one — want me to draft a work order for this repair and assign it to the next available tech in that area?",
-    kind: "followup",
-    sources: [
-      { type: "Inventory", label: "Parts inventory — Wichita branch", short: "Wichita" },
-      { type: "Inventory", label: "Parts inventory — Oklahoma City branch", short: "OKC" },
-      { type: "Parts", label: "Cat 320 — Cooling system parts catalogue", short: "Cat 320 parts" },
-    ],
-  },
-  { id: 5, role: "user", content: "Before I order — can you pull the wiring diagram for the coolant temp sensor circuit? Want to check for corrosion first." },
-  {
-    id: 6,
-    role: "assistant",
-    content:
-      "Good instinct — checking the circuit before swapping parts is the right call, especially given the repeat history on this asset.\n\nI can tell you the sensor sits on the left side of the engine block near the water pump outlet, and the signal wire runs through the engine harness to the ECM at connector J2. But I don't have electrical schematics indexed — only service procedure manuals — so I can't give you a confident pin-out or full harness trace.\n\nFor the actual diagram, you'd need Cat ET or SIS Web: search **C7.1 ACERT, Engine Coolant Temperature Sensor Circuit** under the wiring section.",
+      "Good instinct — checking the circuit before swapping parts is the right call, especially given the repeat history on this asset.\n\nI can tell you the sensor sits on the left side of the engine block near the water pump outlet, and the signal wire runs through the engine harness to the ECM at connector J2. But I don't have electrical schematics indexed — only service procedure manuals — so I can't give you a confident pin-out or full harness trace.\n\nFor the actual diagram you'd need Cat ET or SIS Web: search **C7.1 ACERT, Engine Coolant Temperature Sensor Circuit** under the wiring section.",
     handoff: true,
   },
-  { id: 7, role: "user", content: "Ok let's go ahead — can you draft the work order?" },
+];
+
+// c3 — Work order draft → response interrupted
+const MESSAGES_C3: Message[] = [
+  { id: 1, role: "user", content: "Can you draft the work order for the thermostat replacement on WO-88231?" },
   {
-    id: 8,
+    id: 2,
     role: "assistant",
     content: "On it. Here's a draft work order for the thermostat replacement on ECX-4471:\n\n**Work order — ECX-4471 · Thermostat replacement**\nAsset: 2019 Cat 320 Excavator · Serial #CAT0320GKEC04471\nFault: P0128 — Coolant temperature below thermostat regulating temperature\nBranch: Wichita\n\n**Parts required**\n- 1× Cat thermostat 83°C (Part #1W-2451) — in stock, Wichita branch\n- 1× O-ring seal (included with part)\n\n**Labour estimate**\nApprox. 1.5 hours including coolant drain, thermostat swap,",
     interrupted: true,
   },
 ];
+
+const SAMPLE_MESSAGES = MESSAGES_C1;
+
+const CHAT_MESSAGES: Record<string, Message[]> = {
+  c1: MESSAGES_C1,
+  c2: MESSAGES_C2,
+  c3: MESSAGES_C3,
+};
 
 
 const APPS = [
@@ -720,7 +726,7 @@ export default function ChatbotPage() {
                   setSidebarOpen(false);
                   setView("chat");
                   setChatTitle(chat.title);
-                  setMessages(chat.id === "docs" ? DOCS_MESSAGES : SAMPLE_MESSAGES);
+                  setMessages(chat.id === "docs" ? DOCS_MESSAGES : (CHAT_MESSAGES[chat.id] ?? SAMPLE_MESSAGES));
                 }}
                 style={{ width: "100%", display: "flex", alignItems: "center", textAlign: "left", padding: "0 12px", minHeight: 48, borderRadius: r.md, border: "none", background: chat.id === "c1" ? hoverBg : "none", cursor: "pointer", fontSize: 14, color: textPrimary, whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis" }}
                 onMouseEnter={e => (e.currentTarget.style.background = hoverBg)}
@@ -1102,6 +1108,29 @@ export default function ChatbotPage() {
                     );
                   })}
                 </div>}
+                {mi === lastAiIdx && msg.suggestions && msg.suggestions.length > 0 && (
+                  <div style={{ display: "flex", flexDirection: "column", alignItems: "flex-start", gap: 8, marginTop: 16 }}>
+                    {msg.suggestions.map((s, si) => (
+                      <button
+                        key={si}
+                        onClick={() => {
+                          const userMsg: Message = { id: Date.now(), role: "user", content: s };
+                          setMessages(prev => [...prev, userMsg]);
+                          setThinking(true);
+                          setTimeout(() => {
+                            setMessages(prev => [...prev, { id: Date.now(), role: "assistant", content: "Got it — working on that now.", kind: "followup" }]);
+                            setThinking(false);
+                          }, 2000);
+                        }}
+                        style={{ textAlign: "left", padding: isMobile ? "0 14px" : "7px 14px", minHeight: isMobile ? 48 : "auto", borderRadius: r.lg, border: `1.5px solid ${border}`, background: dark ? "#2a2a2a" : "#f7f6f4", cursor: "pointer", fontFamily: "inherit", color: textPrimary, boxShadow: dark ? "none" : "0 1px 4px rgba(0,0,0,0.07)" }}
+                        onMouseEnter={e => e.currentTarget.style.borderColor = dark ? "#555" : "#ccc"}
+                        onMouseLeave={e => e.currentTarget.style.borderColor = border}
+                      >
+                        <p style={{ whiteSpace: "nowrap", fontSize: 14, color: textPrimary }}>{s}</p>
+                      </button>
+                    ))}
+                  </div>
+                )}
                 {msg.handoff && (
                   <div style={{ display: "flex", flexDirection: "column", alignItems: "flex-start", gap: 10, marginTop: 32, paddingBottom: 8 }}>
                     <span style={{ fontSize: 16, color: textMuted }}>I can't find a reliable answer here — want me to bring in a human?</span>
@@ -1280,7 +1309,7 @@ export default function ChatbotPage() {
               {/* Recents — loads into panel only */}
               <span style={{ fontSize: 13, fontWeight: 500, letterSpacing: rpLs.label, color: rpTextMuted, padding: "16px 12px 6px" }}>Recents</span>
               {PAST_CHATS.filter(c => c.id !== "docs").map(chat => (
-                <button key={chat.id} onClick={() => { setRpMessages(chat.id === "docs" ? DOCS_MESSAGES : SAMPLE_MESSAGES); setRpMenuOpen(false); }} style={{ width: "100%", display: "flex", alignItems: "center", gap: 8, padding: "8px 12px", minHeight: 48, borderRadius: r.md, border: "none", background: "none", cursor: "pointer", textAlign: "left" }} onMouseEnter={e => e.currentTarget.style.background = rpHoverBg} onMouseLeave={e => e.currentTarget.style.background = "none"}>
+                <button key={chat.id} onClick={() => { setRpMessages(chat.id === "docs" ? DOCS_MESSAGES : (CHAT_MESSAGES[chat.id] ?? SAMPLE_MESSAGES)); setRpMenuOpen(false); }} style={{ width: "100%", display: "flex", alignItems: "center", gap: 8, padding: "8px 12px", minHeight: 48, borderRadius: r.md, border: "none", background: "none", cursor: "pointer", textAlign: "left" }} onMouseEnter={e => e.currentTarget.style.background = rpHoverBg} onMouseLeave={e => e.currentTarget.style.background = "none"}>
                   <span style={{ fontSize: 14, color: rpTextPrimary, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap", flex: 1 }}>{chat.title}</span>
                   <span style={{ fontSize: 12, color: rpTextMuted, flexShrink: 0 }}>{chat.date}</span>
                 </button>
@@ -1394,7 +1423,7 @@ export default function ChatbotPage() {
               {PAST_CHATS.filter(c => c.title.toLowerCase().includes(rpSearchQuery.toLowerCase())).map(chat => (
                 <button
                   key={chat.id}
-                  onClick={() => { setRpMessages(chat.id === "docs" ? DOCS_MESSAGES : SAMPLE_MESSAGES); setRpSearchOpen(false); setRpSearchQuery(""); setRpMenuOpen(false); }}
+                  onClick={() => { setRpMessages(chat.id === "docs" ? DOCS_MESSAGES : (CHAT_MESSAGES[chat.id] ?? SAMPLE_MESSAGES)); setRpSearchOpen(false); setRpSearchQuery(""); setRpMenuOpen(false); }}
                   style={{ width: "100%", display: "flex", alignItems: "center", justifyContent: "space-between", padding: "9px 10px", borderRadius: r.md, border: "none", background: "none", cursor: "pointer", textAlign: "left" }}
                   onMouseEnter={e => (e.currentTarget.style.background = rpHoverBg)}
                   onMouseLeave={e => (e.currentTarget.style.background = "none")}
