@@ -841,12 +841,12 @@ export default function ChatbotPage() {
 
         <Tooltip label="Could open Intercom" position="bottom">
           <button
-            aria-label="Talk to a person"
+            aria-label="Talk to a support person"
             style={{ display: "flex", alignItems: "center", background: dark ? "#333" : "#dddddb", border: "none", cursor: "pointer", padding: "5px 12px", borderRadius: r.pill, color: dark ? "#fff" : "#1a1a1a", fontSize: 14, fontWeight: 500, minHeight: 32, fontFamily: "inherit", transition: "background 0.15s" }}
             onMouseEnter={e => e.currentTarget.style.background = dark ? "#444" : "#c8c8c6"}
             onMouseLeave={e => e.currentTarget.style.background = dark ? "#333" : "#dddddb"}
           >
-            Talk to a person
+            Talk to a support person
           </button>
         </Tooltip>
 
@@ -1133,13 +1133,13 @@ export default function ChatbotPage() {
                 )}
                 {msg.handoff && (
                   <div style={{ display: "flex", flexDirection: "column", alignItems: "flex-start", gap: 10, marginTop: 32, paddingBottom: 8 }}>
-                    <span style={{ fontSize: 16, color: textMuted }}>I can't find a reliable answer here — want me to bring in a human?</span>
+                    <span style={{ fontSize: 16, color: textMuted }}>I can't find a reliable answer here — want me to bring in a support person?</span>
                     <button
                       style={{ display: "flex", alignItems: "center", padding: "6px 12px", borderRadius: r.pill, border: `1px solid ${border}`, background: dark ? "#2a2a2a" : "#fff", color: textPrimary, fontSize: 14, fontWeight: 500, cursor: "pointer", whiteSpace: "nowrap", fontFamily: "inherit", transition: "background 0.12s" }}
                       onMouseEnter={e => e.currentTarget.style.background = hoverBg}
                       onMouseLeave={e => e.currentTarget.style.background = dark ? "#2a2a2a" : "#fff"}
                     >
-                      Talk to a person
+                      Talk to a support person
                     </button>
                   </div>
                 )}
