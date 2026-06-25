@@ -1108,29 +1108,6 @@ export default function ChatbotPage() {
                     );
                   })}
                 </div>}
-                {mi === lastAiIdx && msg.suggestions && msg.suggestions.length > 0 && (
-                  <div style={{ display: "flex", flexDirection: "column", alignItems: "flex-start", gap: 8, marginTop: 16 }}>
-                    {msg.suggestions.map((s, si) => (
-                      <button
-                        key={si}
-                        onClick={() => {
-                          const userMsg: Message = { id: Date.now(), role: "user", content: s };
-                          setMessages(prev => [...prev, userMsg]);
-                          setThinking(true);
-                          setTimeout(() => {
-                            setMessages(prev => [...prev, { id: Date.now(), role: "assistant", content: "Got it — working on that now.", kind: "followup" }]);
-                            setThinking(false);
-                          }, 2000);
-                        }}
-                        style={{ textAlign: "left", padding: isMobile ? "0 14px" : "7px 14px", minHeight: isMobile ? 48 : "auto", borderRadius: r.lg, border: `1.5px solid ${border}`, background: dark ? "#2a2a2a" : "#f7f6f4", cursor: "pointer", fontFamily: "inherit", color: textPrimary, boxShadow: dark ? "none" : "0 1px 4px rgba(0,0,0,0.07)" }}
-                        onMouseEnter={e => e.currentTarget.style.borderColor = dark ? "#555" : "#ccc"}
-                        onMouseLeave={e => e.currentTarget.style.borderColor = border}
-                      >
-                        <p style={{ whiteSpace: "nowrap", fontSize: 14, color: textPrimary }}>{s}</p>
-                      </button>
-                    ))}
-                  </div>
-                )}
                 {msg.handoff && (
                   <div style={{ display: "flex", flexDirection: "column", alignItems: "flex-start", gap: 10, marginTop: 32, paddingBottom: 8 }}>
                     <span style={{ fontSize: 16, color: textMuted }}>I can't find a reliable answer here — want me to bring in a support person?</span>
@@ -1176,6 +1153,36 @@ export default function ChatbotPage() {
         </div>
 
       </div>
+      {(() => {
+        const lastAiMsg = [...messages].reverse().find(m => m.role === "assistant");
+        const suggestions = !thinking && lastAiMsg?.suggestions;
+        if (!suggestions || suggestions.length === 0) return null;
+        return (
+          <div style={{ background: bg, paddingTop: 12, paddingBottom: 4 }}>
+            <div style={{ maxWidth: 760, width: "100%", margin: "0 auto", padding: "0 16px", display: "flex", flexDirection: "column", alignItems: "flex-start", gap: 12 }}>
+              {suggestions.map((s, si) => (
+                <button
+                  key={si}
+                  onClick={() => {
+                    const userMsg: Message = { id: Date.now(), role: "user", content: s };
+                    setMessages(prev => [...prev, userMsg]);
+                    setThinking(true);
+                    setTimeout(() => {
+                      setMessages(prev => [...prev, { id: Date.now(), role: "assistant", content: "Got it — working on that now.", kind: "followup" }]);
+                      setThinking(false);
+                    }, 2000);
+                  }}
+                  style={{ textAlign: "left", padding: isMobile ? "0 14px" : "7px 14px", minHeight: isMobile ? 48 : "auto", borderRadius: r.lg, border: `1.5px solid ${border}`, background: dark ? "#2a2a2a" : "#f7f6f4", cursor: "pointer", fontFamily: "inherit", color: textPrimary }}
+                  onMouseEnter={e => e.currentTarget.style.borderColor = dark ? "#555" : "#ccc"}
+                  onMouseLeave={e => e.currentTarget.style.borderColor = border}
+                >
+                  <p style={{ whiteSpace: "nowrap", fontSize: 14, color: textPrimary }}>{s}</p>
+                </button>
+              ))}
+            </div>
+          </div>
+        );
+      })()}
       <div style={{ background: bg, paddingBottom: 12, paddingTop: 8, flexShrink: 0 }}>
         <div style={{ maxWidth: 760, width: "100%", margin: "0 auto", padding: "0 16px" }}>
           <div style={{ background: inputBg, border: `1.5px solid ${border}`, borderRadius: r.xl, boxShadow: dark ? "none" : "0 2px 12px rgba(0,0,0,0.06)" }}>
