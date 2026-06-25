@@ -1111,13 +1111,15 @@ export default function ChatbotPage() {
                 {msg.handoff && (
                   <div style={{ display: "flex", flexDirection: "column", alignItems: "flex-start", gap: 10, marginTop: 32, paddingBottom: 8 }}>
                     <span style={{ fontSize: 16, color: textMuted }}>I can't find a reliable answer here — want me to bring in a support person?</span>
-                    <button
-                      style={{ display: "flex", alignItems: "center", padding: "6px 12px", borderRadius: r.pill, border: `1px solid ${border}`, background: dark ? "#2a2a2a" : "#fff", color: textPrimary, fontSize: 14, fontWeight: 500, cursor: "pointer", whiteSpace: "nowrap", fontFamily: "inherit", transition: "background 0.12s" }}
-                      onMouseEnter={e => e.currentTarget.style.background = hoverBg}
-                      onMouseLeave={e => e.currentTarget.style.background = dark ? "#2a2a2a" : "#fff"}
-                    >
-                      Talk to a support person
-                    </button>
+                    <Tooltip label="Opens Intercom chat" position="top">
+                      <button
+                        style={{ display: "flex", alignItems: "center", padding: "6px 12px", borderRadius: r.pill, border: `1px solid ${border}`, background: dark ? "#2a2a2a" : "#fff", color: textPrimary, fontSize: 14, fontWeight: 500, cursor: "pointer", whiteSpace: "nowrap", fontFamily: "inherit", transition: "background 0.12s" }}
+                        onMouseEnter={e => e.currentTarget.style.background = hoverBg}
+                        onMouseLeave={e => e.currentTarget.style.background = dark ? "#2a2a2a" : "#fff"}
+                      >
+                        Talk to a support person
+                      </button>
+                    </Tooltip>
                   </div>
                 )}
                 {msg.interrupted && !retriedIds.has(msg.id) && (
